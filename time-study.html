@@ -2244,11 +2244,11 @@
                 });
             }
 
-            const csv = ['Date,Operator,Job No,Part,Activities,Efficiency,Internal ST,External ST,Waste ST'];
+            const csv = ['Date,Operator,Job No,Part,Activities,Efficiency,Internal ST,External ST,Waste ST,Final Std Time'];
             sessions.forEach(s => {
                 const total = (s.internalST || 0) + (s.externalTotal || 0) + (s.wasteTotal || 0);
                 const efficiency = total === 0 ? 0 : ((s.internalST || 0) / total * 100).toFixed(1);
-                csv.push(`"${s.date}","${s.operator}","${s.jobNo}","${s.partDescription}",${s.activities?.length || 0},${efficiency},"${(s.internalST || 0).toFixed(2)}","${(s.externalTotal || 0).toFixed(2)}","${(s.wasteTotal || 0).toFixed(2)}"`);
+                csv.push(`"${s.date}","${s.operator}","${s.jobNo}","${s.partDescription}",${s.activities?.length || 0},${efficiency},"${(s.internalST || 0).toFixed(2)}","${(s.externalTotal || 0).toFixed(2)}","${(s.wasteTotal || 0).toFixed(2)}","${total.toFixed(2)}"`);
             });
 
             const blob = new Blob([csv.join('\n')], { type: 'text/csv' });
@@ -2284,11 +2284,11 @@
                 return;
             }
 
-            const csv = ['Date,Operator,Job No,Part,Activities,Efficiency,Internal ST,External ST,Waste ST'];
+            const csv = ['Date,Operator,Job No,Part,Activities,Efficiency,Internal ST,External ST,Waste ST,Final Std Time'];
             starredSessions.forEach(s => {
                 const total = (s.internalST || 0) + (s.externalTotal || 0) + (s.wasteTotal || 0);
                 const efficiency = total === 0 ? 0 : ((s.internalST || 0) / total * 100).toFixed(1);
-                csv.push(`"${s.date}","${s.operator}","${s.jobNo}","${s.partDescription}",${s.activities?.length || 0},${efficiency},"${(s.internalST || 0).toFixed(2)}","${(s.externalTotal || 0).toFixed(2)}","${(s.wasteTotal || 0).toFixed(2)}"`);
+                csv.push(`"${s.date}","${s.operator}","${s.jobNo}","${s.partDescription}",${s.activities?.length || 0},${efficiency},"${(s.internalST || 0).toFixed(2)}","${(s.externalTotal || 0).toFixed(2)}","${(s.wasteTotal || 0).toFixed(2)}","${total.toFixed(2)}"`);
             });
 
             const blob = new Blob([csv.join('\n')], { type: 'text/csv' });
