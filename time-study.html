@@ -1067,6 +1067,21 @@
 
     <!-- Floating Action Buttons Container -->
     <div style="position: fixed; bottom: 30px; right: 30px; z-index: 1000; display: flex; flex-direction: column; gap: 10px; align-items: flex-end;">
+        <!-- Back to Home button -->
+        <button id="floatingBackBtn" onclick="switchScreen('homeScreen')" style="
+            padding: 15px 20px;
+            font-size: 16px;
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            font-weight: bold;
+            white-space: nowrap;
+            display: none;
+        ">🏠 Home</button>
+
         <!-- Dark Mode Toggle -->
         <button onclick="toggleDarkMode()" style="
             padding: 15px 20px;
@@ -1719,19 +1734,25 @@
             });
             document.getElementById(screenId).classList.add('active');
 
+            // Show/hide back button based on screen
+            const backBtn = document.getElementById('floatingBackBtn');
             if (screenId === 'homeScreen') {
+                backBtn.style.display = 'none';
                 loadDashboard();
                 if (state.recognition) state.recognition.abort();
                 state.shouldProcessSpeechResults = false;
-            } else if (screenId === 'analyticsScreen') {
-                if (state.recognition) state.recognition.abort();
-                state.shouldProcessSpeechResults = false;
-                const today = new Date().toISOString().split('T')[0];
-                document.getElementById('filterDateTo').value = today;
-                updateAnalytics();
-            } else if (screenId === 'sessionDetailsScreen') {
-                if (state.recognition) state.recognition.abort();
-                state.shouldProcessSpeechResults = false;
+            } else {
+                backBtn.style.display = 'block';
+                if (screenId === 'analyticsScreen') {
+                    if (state.recognition) state.recognition.abort();
+                    state.shouldProcessSpeechResults = false;
+                    const today = new Date().toISOString().split('T')[0];
+                    document.getElementById('filterDateTo').value = today;
+                    updateAnalytics();
+                } else if (screenId === 'sessionDetailsScreen') {
+                    if (state.recognition) state.recognition.abort();
+                    state.shouldProcessSpeechResults = false;
+                }
             }
         }
 
