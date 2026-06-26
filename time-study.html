@@ -42,6 +42,12 @@
             color: #e0e0e0;
         }
 
+        body.dark-mode [style*="position: fixed; bottom: 0"] {
+            background-color: #2d2d2d !important;
+            color: #999 !important;
+            border-top-color: #444 !important;
+        }
+
         .screen.active {
             display: block;
         }
@@ -1096,6 +1102,11 @@
         ">➕ DO TIME STUDY</button>
     </div>
 
+    <!-- Copyright Footer -->
+    <div style="position: fixed; bottom: 0; left: 0; right: 0; background-color: #f5f5f5; padding: 10px; text-align: center; font-size: 12px; color: #666; border-top: 1px solid #e0e0e0; z-index: 999;">
+        © 2026 Konrad Andrag. All rights reserved.
+    </div>
+
     <script>
         // Toast notification system
         function showToast(message, type = 'success', duration = 3000) {
@@ -1596,7 +1607,8 @@
 
         // Export as CSV
         function exportCSV() {
-            let csv = 'DIGITAL TIME STUDY REPORT\n\n';
+            let csv = '© 2026 Konrad Andrag. All rights reserved.\n';
+            csv += 'DIGITAL TIME STUDY REPORT\n\n';
             csv += `Date,${state.session.date}\n`;
             csv += `Item Master No,${state.session.itemMasterNo}\n`;
             csv += `Operator,${state.session.operator}\n\n`;
@@ -2213,7 +2225,7 @@
                 });
             }
 
-            const csv = ['Date,Item Master No,Operator,Activities,Efficiency,Internal ST,External ST,Waste ST,Final Std Time'];
+            const csv = ['© 2026 Konrad Andrag. All rights reserved.', '', 'Date,Item Master No,Operator,Activities,Efficiency,Internal ST,External ST,Waste ST,Final Std Time'];
             sessions.forEach(s => {
                 const total = (s.internalST || 0) + (s.externalTotal || 0) + (s.wasteTotal || 0);
                 const efficiency = total === 0 ? 0 : ((s.internalST || 0) / total * 100).toFixed(1);
@@ -2253,7 +2265,7 @@
                 return;
             }
 
-            const csv = ['Date,Item Master No,Operator,Activities,Efficiency,Internal ST,External ST,Waste ST,Final Std Time'];
+            const csv = ['© 2026 Konrad Andrag. All rights reserved.', '', 'Date,Item Master No,Operator,Activities,Efficiency,Internal ST,External ST,Waste ST,Final Std Time'];
             starredSessions.forEach(s => {
                 const total = (s.internalST || 0) + (s.externalTotal || 0) + (s.wasteTotal || 0);
                 const efficiency = total === 0 ? 0 : ((s.internalST || 0) / total * 100).toFixed(1);
@@ -2286,7 +2298,7 @@
                 });
             }
 
-            const data = { sessions, starred, exportDate: new Date().toISOString() };
+            const data = { copyright: '© 2026 Konrad Andrag. All rights reserved.', sessions, starred, exportDate: new Date().toISOString() };
 
             const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
             const link = document.createElement('a');
