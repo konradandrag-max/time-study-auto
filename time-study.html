@@ -1929,23 +1929,26 @@
                 }).join('');
             }
 
-            // Chart data - last 30 days (including today)
+            // Chart data - last 30 days from latest study date (or today if no studies)
+            let endDate = now;
+            if (sessions.length > 0) {
+                const latestStudyDate = new Date(Math.max(...sessions.map(s => new Date(s.date).getTime())));
+                endDate = latestStudyDate;
+            }
+
             const last30Days = [];
             for (let i = 29; i >= -1; i--) {
                 let date;
                 if (i === -1) {
-                    date = now; // Today
+                    date = new Date(endDate); // Latest study date or today
                 } else {
-                    date = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i);
+                    date = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate() - i);
                 }
                 const dateStr = date.toISOString().split('T')[0];
                 const daySessions = sessions.filter(s => s.date === dateStr);
                 const dayEff = calcEfficiency(daySessions);
                 last30Days.push({ date: dateStr.split('-')[2], dateStr, efficiency: dayEff, count: daySessions.length });
             }
-            console.log('Chart data - Full array length:', last30Days.length);
-            console.log('Chart data - Last 10 days:', last30Days.slice(-10).map(d => ({date: d.dateStr, eff: d.efficiency, count: d.count})));
-            console.log('2026-06-26 data:', last30Days.filter(d => d.dateStr === '2026-06-26'));
 
             // Monthly trend chart
             const monthCtx = document.getElementById('monthChart')?.getContext('2d');
