@@ -1043,6 +1043,10 @@
                     <div class="value" id="wasteTotal">0.00</div>
                 </div>
                 <div class="summary-item">
+                    <label>Final Std Time</label>
+                    <div class="value" id="finalStdTime">0.00</div>
+                </div>
+                <div class="summary-item">
                     <label>Overall Efficiency</label>
                     <div class="value" id="efficiency">0.00%</div>
                 </div>
@@ -1577,7 +1581,7 @@
             const adjustedBT = Math.max(0, totalDiff - delayDiff);
             document.getElementById('btValue').textContent = adjustedBT.toFixed(2) + (delayDiff > 0 ? ` (${totalDiff.toFixed(2)} - ${delayDiff.toFixed(2)})` : '');
 
-            let internalNT = 0, internalST = 0, externalNT = 0, wasteNT = 0;
+            let internalNT = 0, internalST = 0, externalNT = 0, externalST = 0, wasteNT = 0, wasteST = 0;
             state.activities.forEach(activity => {
                 if (activity.classification === 'Delay') return; // Skip delay activities
                 const nt = parseFloat((activity.diff * state.sessionRating / 100).toFixed(2));
@@ -1587,15 +1591,20 @@
                     internalST += st;
                 } else if (activity.classification === 'External') {
                     externalNT += nt;
+                    externalST += st;
                 } else if (activity.classification === 'Waste') {
                     wasteNT += nt;
+                    wasteST += st;
                 }
             });
+
+            const finalStdTime = internalST + externalST + wasteST;
 
             document.getElementById('internalTotal').textContent = internalNT.toFixed(2);
             document.getElementById('internalST').textContent = internalST.toFixed(2);
             document.getElementById('externalTotal').textContent = externalNT.toFixed(2);
             document.getElementById('wasteTotal').textContent = wasteNT.toFixed(2);
+            document.getElementById('finalStdTime').textContent = finalStdTime.toFixed(2);
 
             const efficiency = adjustedBT > 0 ? (internalNT / adjustedBT * 100) : 0;
             document.getElementById('efficiency').textContent = efficiency.toFixed(2) + '%';
