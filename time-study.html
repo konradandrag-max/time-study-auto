@@ -1459,6 +1459,13 @@
         function saveSession() {
             const sessions = JSON.parse(localStorage.getItem('timeSessions')) || [];
 
+            // Default any unclassified activities to 'Internal'
+            state.activities.forEach(activity => {
+                if (!activity.classification) {
+                    activity.classification = 'Internal';
+                }
+            });
+
             // Calculate totals
             let internalST = 0, externalTotal = 0, wasteTotal = 0;
             state.activities.forEach(activity => {
@@ -1511,7 +1518,7 @@
                     <td>${st}</td>
                     <td>
                         <div class="classification-buttons">
-                            <button class="btn-internal ${activity.classification === 'Internal' ? 'active' : ''}" onclick="setClassification(${index}, 'Internal')">Int</button>
+                            <button class="btn-internal ${activity.classification === 'Internal' || !activity.classification ? 'active' : ''}" onclick="setClassification(${index}, 'Internal')">Int</button>
                             <button class="btn-external ${activity.classification === 'External' ? 'active' : ''}" onclick="setClassification(${index}, 'External')">Ext</button>
                             <button class="btn-waste ${activity.classification === 'Waste' ? 'active' : ''}" onclick="setClassification(${index}, 'Waste')">Wst</button>
                             <button class="btn-delay ${activity.classification === 'Delay' ? 'active' : ''}" onclick="setClassification(${index}, 'Delay')" style="background-color: #9c27b0; font-size: 10px; padding: 4px 6px;">Dly</button>
@@ -1703,7 +1710,13 @@
                 loadDashboard();
                 if (state.recognition) state.recognition.abort();
                 state.shouldProcessSpeechResults = false;
-            } else if (screenId === 'analyticsScreen' || screenId === 'sessionDetailsScreen') {
+            } else if (screenId === 'analyticsScreen') {
+                if (state.recognition) state.recognition.abort();
+                state.shouldProcessSpeechResults = false;
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('filterDateTo').value = today;
+                updateAnalytics();
+            } else if (screenId === 'sessionDetailsScreen') {
                 if (state.recognition) state.recognition.abort();
                 state.shouldProcessSpeechResults = false;
             }
