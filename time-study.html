@@ -653,7 +653,6 @@
             <div style="margin-bottom: 30px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                     <h2>Recent Sessions (Last 7 days)</h2>
-                    <button onclick="switchScreen('analyticsScreen')" style="background-color: #17a2b8; padding: 10px 20px; font-size: 14px;">📊 View All</button>
                 </div>
                 <div id="recentSessions" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px;">
                     <p style="color: #999; grid-column: 1/-1;">No sessions yet. Click the button below to start a new time study.</p>
@@ -1095,6 +1094,20 @@
             font-weight: bold;
             white-space: nowrap;
         ">⚙️ Settings</button>
+
+        <!-- View Historical Data button -->
+        <button onclick="switchScreen('analyticsScreen')" style="
+            padding: 15px 20px;
+            font-size: 16px;
+            background-color: #17a2b8;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            font-weight: bold;
+            white-space: nowrap;
+        ">📊 View Historical Data</button>
 
         <!-- Floating DO TIME STUDY button -->
         <button id="floatingStudyBtn" onclick="switchScreen('screen1')" style="
