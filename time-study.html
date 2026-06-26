@@ -1632,19 +1632,34 @@
             csv += 'Allowances,' + state.sessionAllowance.toFixed(1) + '%\n';
 
             const bt = state.activities.length > 0 ? state.activities[state.activities.length - 1].ot : 0;
-            let internalNT = 0, internalST = 0;
+            let internalNT = 0, internalST = 0, externalNT = 0, externalST = 0, wasteNT = 0, wasteST = 0;
             state.activities.forEach(activity => {
+                if (activity.classification === 'Delay') return;
+                const nt = parseFloat((activity.diff * state.sessionRating / 100).toFixed(2));
+                const st = parseFloat((nt * (1 + state.sessionAllowance / 100)).toFixed(2));
                 if (activity.classification === 'Internal') {
-                    const nt = parseFloat((activity.diff * state.sessionRating / 100).toFixed(2));
                     internalNT += nt;
-                    internalST += parseFloat((nt * (1 + state.sessionAllowance / 100)).toFixed(2));
+                    internalST += st;
+                } else if (activity.classification === 'External') {
+                    externalNT += nt;
+                    externalST += st;
+                } else if (activity.classification === 'Waste') {
+                    wasteNT += nt;
+                    wasteST += st;
                 }
             });
+
+            const finalStdTime = internalST + externalST + wasteST;
 
             csv += '\nSUMMARY\n';
             csv += `BT,${bt.toFixed(2)}\n`;
             csv += `Total Internal NT,${internalNT.toFixed(2)}\n`;
             csv += `Total Internal ST,${internalST.toFixed(2)}\n`;
+            csv += `Total External NT,${externalNT.toFixed(2)}\n`;
+            csv += `Total External ST,${externalST.toFixed(2)}\n`;
+            csv += `Total Waste NT,${wasteNT.toFixed(2)}\n`;
+            csv += `Total Waste ST,${wasteST.toFixed(2)}\n`;
+            csv += `Final Std Time,${finalStdTime.toFixed(2)}\n`;
             csv += `Efficiency,${(bt > 0 ? (internalNT / bt * 100) : 0).toFixed(2)}%\n`;
 
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
