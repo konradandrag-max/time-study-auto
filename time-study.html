@@ -1906,15 +1906,23 @@
                 recentDiv.innerHTML = recentSessions.slice(0, 6).map((s, idx) => {
                     const eff = ((s.internalST || 0) / ((s.internalST || 0) + (s.externalTotal || 0) + (s.wasteTotal || 0)) * 100).toFixed(1);
                     const totalST = (s.internalST || 0) + (s.externalTotal || 0) + (s.wasteTotal || 0);
+                    const starred = JSON.parse(localStorage.getItem('starredSessions')) || [];
+                    const isStarred = starred.some(st => st.date === s.date && st.operator === s.operator && st.jobNo === s.jobNo);
+                    const starIcon = isStarred ? '⭐' : '☆';
                     return `
-                        <div onclick="viewSessionDetails(${idx})" style="background: #f9f9f9; padding: 15px; border-radius: 8px; border-left: 4px solid #007bff; box-shadow: 0 2px 4px rgba(0,0,0,0.05); cursor: pointer; transition: all 0.3s; hover: transform scale(1.02); hover: box-shadow 0 4px 8px rgba(0,0,0,0.1);">
-                            <strong>${s.partDescription}</strong><br>
-                            <small style="color: #666;">${s.jobNo} | ${s.date}</small><br>
-                            <small style="color: #666;">Operator: ${s.operator}</small><br>
-                            <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #e0e0e0;">
-                                <span style="background: #e3f2fd; padding: 4px 8px; border-radius: 4px; font-size: 12px; color: #1976d2;">${s.activities?.length || 0} activities</span>
-                                <span style="background: #f0f4c3; padding: 4px 8px; border-radius: 4px; font-size: 12px; color: #f57c00; margin-left: 5px;">Efficiency: ${eff}%</span>
-                                <span style="background: #e8f5e9; padding: 4px 8px; border-radius: 4px; font-size: 12px; color: #388e3c; margin-left: 5px;">ST: ${totalST.toFixed(2)}</span>
+                        <div style="background: #f9f9f9; padding: 15px; border-radius: 8px; border-left: 4px solid #007bff; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: all 0.3s;">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                <div onclick="viewSessionDetails(${idx})" style="flex: 1; cursor: pointer;">
+                                    <strong>${s.partDescription}</strong><br>
+                                    <small style="color: #666;">${s.jobNo} | ${s.date}</small><br>
+                                    <small style="color: #666;">Operator: ${s.operator}</small><br>
+                                    <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #e0e0e0;">
+                                        <span style="background: #e3f2fd; padding: 4px 8px; border-radius: 4px; font-size: 12px; color: #1976d2;">${s.activities?.length || 0} activities</span>
+                                        <span style="background: #f0f4c3; padding: 4px 8px; border-radius: 4px; font-size: 12px; color: #f57c00; margin-left: 5px;">Efficiency: ${eff}%</span>
+                                        <span style="background: #e8f5e9; padding: 4px 8px; border-radius: 4px; font-size: 12px; color: #388e3c; margin-left: 5px;">ST: ${totalST.toFixed(2)}</span>
+                                    </div>
+                                </div>
+                                <button onclick="event.stopPropagation(); toggleStar('${s.date}', '${s.jobNo}', '${s.operator}'); loadDashboard();" style="background: none; border: none; font-size: 20px; cursor: pointer; padding: 5px; color: #ffc107;">${starIcon}</button>
                             </div>
                         </div>
                     `;
