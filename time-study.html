@@ -2205,7 +2205,18 @@
         }
 
         function exportAllData() {
-            const sessions = JSON.parse(localStorage.getItem('timeSessions')) || [];
+            let sessions = JSON.parse(localStorage.getItem('timeSessions')) || [];
+            const filterDateFrom = document.getElementById('filterDateFrom')?.value || '';
+            const filterDateTo = document.getElementById('filterDateTo')?.value || '';
+
+            if (filterDateFrom || filterDateTo) {
+                sessions = sessions.filter(s => {
+                    if (filterDateFrom && s.date < filterDateFrom) return false;
+                    if (filterDateTo && s.date > filterDateTo) return false;
+                    return true;
+                });
+            }
+
             const csv = ['Date,Operator,Job No,Part,Activities,Efficiency,Internal ST,External ST,Waste ST'];
             sessions.forEach(s => {
                 const total = (s.internalST || 0) + (s.externalTotal || 0) + (s.wasteTotal || 0);
@@ -2221,13 +2232,25 @@
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-            showToast('📥 All sessions exported as CSV');
+            const dateRange = (filterDateFrom || filterDateTo) ? ` (${filterDateFrom || 'start'} to ${filterDateTo || 'end'})` : '';
+            showToast(`📥 Sessions exported as CSV${dateRange}`);
         }
 
         function exportStarredSessions() {
-            const sessions = JSON.parse(localStorage.getItem('timeSessions')) || [];
+            let sessions = JSON.parse(localStorage.getItem('timeSessions')) || [];
             const starred = JSON.parse(localStorage.getItem('starredSessions')) || [];
-            const starredSessions = sessions.filter(s => starred.some(st => st.date === s.date && st.operator === s.operator && st.jobNo === s.jobNo));
+            const filterDateFrom = document.getElementById('filterDateFrom')?.value || '';
+            const filterDateTo = document.getElementById('filterDateTo')?.value || '';
+
+            let starredSessions = sessions.filter(s => starred.some(st => st.date === s.date && st.operator === s.operator && st.jobNo === s.jobNo));
+
+            if (filterDateFrom || filterDateTo) {
+                starredSessions = starredSessions.filter(s => {
+                    if (filterDateFrom && s.date < filterDateFrom) return false;
+                    if (filterDateTo && s.date > filterDateTo) return false;
+                    return true;
+                });
+            }
 
             if (starredSessions.length === 0) {
                 showToast('⚠️ No starred sessions to export');
@@ -2249,12 +2272,24 @@
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-            showToast('⭐ Starred sessions exported as CSV');
+            const dateRange = (filterDateFrom || filterDateTo) ? ` (${filterDateFrom || 'start'} to ${filterDateTo || 'end'})` : '';
+            showToast(`⭐ Starred sessions exported as CSV${dateRange}`);
         }
 
         function exportAsJSON() {
-            const sessions = JSON.parse(localStorage.getItem('timeSessions')) || [];
+            let sessions = JSON.parse(localStorage.getItem('timeSessions')) || [];
             const starred = JSON.parse(localStorage.getItem('starredSessions')) || [];
+            const filterDateFrom = document.getElementById('filterDateFrom')?.value || '';
+            const filterDateTo = document.getElementById('filterDateTo')?.value || '';
+
+            if (filterDateFrom || filterDateTo) {
+                sessions = sessions.filter(s => {
+                    if (filterDateFrom && s.date < filterDateFrom) return false;
+                    if (filterDateTo && s.date > filterDateTo) return false;
+                    return true;
+                });
+            }
+
             const data = { sessions, starred, exportDate: new Date().toISOString() };
 
             const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -2265,7 +2300,8 @@
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-            showToast('💾 Data exported as JSON');
+            const dateRange = (filterDateFrom || filterDateTo) ? ` (${filterDateFrom || 'start'} to ${filterDateTo || 'end'})` : '';
+            showToast(`💾 Data exported as JSON${dateRange}`);
         }
 
         function updateDashboardSTChart() {
