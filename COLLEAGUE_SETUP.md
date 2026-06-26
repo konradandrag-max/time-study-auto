@@ -53,7 +53,16 @@ That's it! Your app is ready to use. 🎉
    - App transcribes speech automatically (offline)
    - No internet needed!
 
-4. **View Analytics**
+4. **Review & Save**
+   - Review your activities before saving
+   - Click to edit individual activities if needed
+
+5. **Edit Saved Studies**
+   - Go to Dashboard to view your saved studies
+   - Click on any study to edit activities, ratings, and details
+   - Changes are saved automatically
+
+6. **View Analytics**
    - Dashboard shows your efficiency trends
    - Export data as CSV or JSON
 
