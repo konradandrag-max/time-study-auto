@@ -1108,6 +1108,9 @@
     </div>
 
     <script>
+        // Speech server configuration
+        const SPEECH_SERVER_URL = 'http://localhost:5555'; // Change this when deploying to production
+
         // Toast notification system
         function showToast(message, type = 'success', duration = 3000) {
             const container = document.getElementById('toastContainer');
@@ -1156,6 +1159,7 @@
             isRecording: false,
             recognition: null,
             timerInterval: null,
+            keepAliveInterval: null,
             micPermissionGranted: false,
             micPermissionRequested: false,
             shouldProcessSpeechResults: false,
@@ -1685,6 +1689,22 @@
         }
 
         // Screen navigation
+        // Keep-alive ping to keep server awake during recording
+        function startKeepAlive() {
+            if (state.keepAliveInterval) clearInterval(state.keepAliveInterval);
+            state.keepAliveInterval = setInterval(() => {
+                fetch(SPEECH_SERVER_URL + '/health')
+                    .catch(() => {}); // Silently handle errors
+            }, 12 * 60 * 1000); // Ping every 12 minutes
+        }
+
+        function stopKeepAlive() {
+            if (state.keepAliveInterval) {
+                clearInterval(state.keepAliveInterval);
+                state.keepAliveInterval = null;
+            }
+        }
+
         function switchScreen(screenId) {
             document.querySelectorAll('.screen').forEach(screen => {
                 screen.classList.remove('active');
@@ -1695,18 +1715,24 @@
             const backBtn = document.getElementById('floatingBackBtn');
             if (screenId === 'homeScreen') {
                 backBtn.style.display = 'none';
+                stopKeepAlive();
                 loadDashboard();
                 if (state.recognition) state.recognition.abort();
                 state.shouldProcessSpeechResults = false;
             } else {
                 backBtn.style.display = 'block';
-                if (screenId === 'analyticsScreen') {
+                if (screenId === 'screen2') {
+                    startKeepAlive();
+                    state.shouldProcessSpeechResults = true;
+                } else if (screenId === 'analyticsScreen') {
+                    stopKeepAlive();
                     if (state.recognition) state.recognition.abort();
                     state.shouldProcessSpeechResults = false;
                     const today = new Date().toISOString().split('T')[0];
                     document.getElementById('filterDateTo').value = today;
                     updateAnalytics();
                 } else if (screenId === 'sessionDetailsScreen') {
+                    stopKeepAlive();
                     if (state.recognition) state.recognition.abort();
                     state.shouldProcessSpeechResults = false;
                 }
