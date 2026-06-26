@@ -1,0 +1,20 @@
+# Speech model (large, auto-downloaded)
+model/
+model.zip
+
+# Python virtual environments
+venv/
+env/
+__pycache__/
+*.pyc
+*.pyo
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
