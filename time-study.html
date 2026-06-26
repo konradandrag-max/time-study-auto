@@ -810,6 +810,10 @@
                         <input type="text" id="filterOperation" placeholder="Filter by operation" onchange="updateAnalytics()">
                     </div>
                     <div class="form-field">
+                        <label>Item Master No</label>
+                        <input type="text" id="filterItemMasterNo" placeholder="Filter by item master" onchange="updateAnalytics()">
+                    </div>
+                    <div class="form-field">
                         <label>Qty</label>
                         <input type="text" id="filterQty" placeholder="Filter by quantity" onchange="updateAnalytics()">
                     </div>
@@ -939,6 +943,10 @@
                 <div class="form-field">
                     <label for="operationNo">Operation No *</label>
                     <input type="text" id="operationNo" placeholder="e.g., OP-01">
+                </div>
+                <div class="form-field">
+                    <label for="itemMasterNo">Item Master No</label>
+                    <input type="text" id="itemMasterNo" placeholder="e.g., IM-001">
                 </div>
             </div>
             <div class="button-group">
@@ -1298,6 +1306,7 @@
             const operator = document.getElementById('operator').value.trim();
             const qty = parseFloat(document.getElementById('qty').value) || 0;
             const operationNo = document.getElementById('operationNo').value.trim();
+            const itemMasterNo = document.getElementById('itemMasterNo').value.trim();
 
             if (!partDescription || !jobNo || !date || !workCentre || !operator || !operationNo) {
                 alert('Please fill in all required fields');
@@ -1311,7 +1320,8 @@
                 workCentre,
                 operator,
                 qty,
-                operationNo
+                operationNo,
+                itemMasterNo
             };
 
             state.activities = [];
@@ -1654,7 +1664,8 @@
             csv += `Work Centre,${state.session.workCentre}\n`;
             csv += `Operator,${state.session.operator}\n`;
             csv += `Qty,${state.session.qty}\n`;
-            csv += `Operation No,${state.session.operationNo}\n\n`;
+            csv += `Operation No,${state.session.operationNo}\n`;
+            csv += `Item Master No,${state.session.itemMasterNo || ''}\n\n`;
 
             csv += 'No,Operation,Description,OT,DIFF,NT,ST,Classification\n';
             state.activities.forEach(activity => {
@@ -2104,6 +2115,7 @@
             const filterDateTo = document.getElementById('filterDateTo')?.value || '';
             const filterPart = document.getElementById('filterPart')?.value.toLowerCase() || '';
             const filterOperation = document.getElementById('filterOperation')?.value.toLowerCase() || '';
+            const filterItemMasterNo = document.getElementById('filterItemMasterNo')?.value.toLowerCase() || '';
             const filterQty = document.getElementById('filterQty')?.value.toLowerCase() || '';
 
             const sessions = JSON.parse(localStorage.getItem('timeSessions')) || [];
@@ -2116,6 +2128,7 @@
                 if (filterDateTo && session.date > filterDateTo) return false;
                 if (filterPart && !session.partDescription.toLowerCase().includes(filterPart)) return false;
                 if (filterOperation && !session.operationNo.toLowerCase().includes(filterOperation)) return false;
+                if (filterItemMasterNo && !((session.itemMasterNo || '').toLowerCase().includes(filterItemMasterNo))) return false;
                 if (filterQty && !String(session.qty).toLowerCase().includes(filterQty)) return false;
                 return true;
             });
@@ -2217,6 +2230,7 @@
             const filterDateTo = document.getElementById('filterDateTo')?.value || '';
             const filterPart = document.getElementById('filterPart')?.value.toLowerCase() || '';
             const filterOperation = document.getElementById('filterOperation')?.value.toLowerCase() || '';
+            const filterItemMasterNo = document.getElementById('filterItemMasterNo')?.value.toLowerCase() || '';
             const filterQty = document.getElementById('filterQty')?.value.toLowerCase() || '';
 
             let filtered = sessions.filter(session => {
@@ -2227,6 +2241,7 @@
                 if (filterDateTo && session.date > filterDateTo) return false;
                 if (filterPart && !session.partDescription.toLowerCase().includes(filterPart)) return false;
                 if (filterOperation && !session.operationNo.toLowerCase().includes(filterOperation)) return false;
+                if (filterItemMasterNo && !((session.itemMasterNo || '').toLowerCase().includes(filterItemMasterNo))) return false;
                 if (filterQty && !String(session.qty).toLowerCase().includes(filterQty)) return false;
                 return true;
             });
@@ -2274,6 +2289,7 @@
             document.getElementById('filterDateTo').value = '';
             document.getElementById('filterPart').value = '';
             document.getElementById('filterOperation').value = '';
+            document.getElementById('filterItemMasterNo').value = '';
             document.getElementById('filterQty').value = '';
             updateAnalytics();
         }
@@ -2465,6 +2481,7 @@
             const filterDateTo = document.getElementById('filterDateTo')?.value || '';
             const filterPart = document.getElementById('filterPart')?.value.toLowerCase() || '';
             const filterOperation = document.getElementById('filterOperation')?.value.toLowerCase() || '';
+            const filterItemMasterNo = document.getElementById('filterItemMasterNo')?.value.toLowerCase() || '';
             const filterQty = document.getElementById('filterQty')?.value.toLowerCase() || '';
 
             let sessions = allSessions.filter(session => {
@@ -2475,6 +2492,7 @@
                 if (filterDateTo && session.date > filterDateTo) return false;
                 if (filterPart && !session.partDescription.toLowerCase().includes(filterPart)) return false;
                 if (filterOperation && !session.operationNo.toLowerCase().includes(filterOperation)) return false;
+                if (filterItemMasterNo && !((session.itemMasterNo || '').toLowerCase().includes(filterItemMasterNo))) return false;
                 if (filterQty && !String(session.qty).toLowerCase().includes(filterQty)) return false;
                 return true;
             });
@@ -2600,6 +2618,7 @@
             document.getElementById('operator').value = '';
             document.getElementById('qty').value = '';
             document.getElementById('operationNo').value = '';
+            document.getElementById('itemMasterNo').value = '';
             document.getElementById('activityInput').value = '';
             document.getElementById('sessionRating').value = '100';
             document.getElementById('sessionAllowance').value = '10';
