@@ -786,12 +786,8 @@
                         <input type="text" id="filterOperator" placeholder="Filter by operator" onchange="updateAnalytics()">
                     </div>
                     <div class="form-field">
-                        <label>Machine/Work Centre</label>
-                        <input type="text" id="filterWorkCentre" placeholder="Filter by work centre" onchange="updateAnalytics()">
-                    </div>
-                    <div class="form-field">
-                        <label>Job No</label>
-                        <input type="text" id="filterJobNo" placeholder="Filter by job" onchange="updateAnalytics()">
+                        <label>Item Master No</label>
+                        <input type="text" id="filterItemMasterNo" placeholder="Filter by item master" onchange="updateAnalytics()">
                     </div>
                     <div class="form-field">
                         <label>Date From</label>
@@ -800,22 +796,6 @@
                     <div class="form-field">
                         <label>Date To</label>
                         <input type="date" id="filterDateTo" onchange="updateAnalytics()">
-                    </div>
-                    <div class="form-field">
-                        <label>Part Description</label>
-                        <input type="text" id="filterPart" placeholder="Filter by part" onchange="updateAnalytics()">
-                    </div>
-                    <div class="form-field">
-                        <label>Operation No</label>
-                        <input type="text" id="filterOperation" placeholder="Filter by operation" onchange="updateAnalytics()">
-                    </div>
-                    <div class="form-field">
-                        <label>Item Master No</label>
-                        <input type="text" id="filterItemMasterNo" placeholder="Filter by item master" onchange="updateAnalytics()">
-                    </div>
-                    <div class="form-field">
-                        <label>Qty</label>
-                        <input type="text" id="filterQty" placeholder="Filter by quantity" onchange="updateAnalytics()">
                     </div>
                 </div>
                 <button onclick="clearFilters()" style="background-color: #6c757d;">Clear All Filters</button>
@@ -834,8 +814,6 @@
                         <label style="font-size: 12px; font-weight: 600;">Compare By:</label>
                         <select id="stCompareBy" onchange="updateSTComparison()" style="width: 100%; max-width: 200px; padding: 5px; font-size: 12px; border: 1px solid #ccc; border-radius: 3px;">
                             <option value="operator">Operator</option>
-                            <option value="operation">Operation</option>
-                            <option value="part">Part</option>
                         </select>
                     </div>
                     <canvas id="stComparisonChart" style="max-height: 280px;"></canvas>
@@ -913,40 +891,16 @@
             </div>
             <div class="form-group">
                 <div class="form-field">
-                    <label for="partDescription">Part Description *</label>
-                    <input type="text" id="partDescription" placeholder="e.g., Widget A">
-                </div>
-                <div class="form-field">
-                    <label for="jobNo">Job No *</label>
-                    <input type="text" id="jobNo" placeholder="e.g., JOB001">
-                </div>
-                <div class="form-field">
                     <label for="date">Date *</label>
                     <input type="date" id="date">
                 </div>
-            </div>
-            <div class="form-group">
                 <div class="form-field">
-                    <label for="workCentre">Work Centre *</label>
-                    <input type="text" id="workCentre" placeholder="e.g., WC-01">
+                    <label for="itemMasterNo">Item Master No *</label>
+                    <input type="text" id="itemMasterNo" placeholder="e.g., IM-001">
                 </div>
                 <div class="form-field">
                     <label for="operator">Operator *</label>
                     <input type="text" id="operator" placeholder="e.g., John Smith">
-                </div>
-                <div class="form-field">
-                    <label for="qty">Qty</label>
-                    <input type="number" id="qty" placeholder="e.g., 100" step="0.01">
-                </div>
-            </div>
-            <div class="form-group">
-                <div class="form-field">
-                    <label for="operationNo">Operation No *</label>
-                    <input type="text" id="operationNo" placeholder="e.g., OP-01">
-                </div>
-                <div class="form-field">
-                    <label for="itemMasterNo">Item Master No</label>
-                    <input type="text" id="itemMasterNo" placeholder="e.g., IM-001">
                 </div>
             </div>
             <div class="button-group">
@@ -1299,29 +1253,19 @@
 
         // Start the study session
         function startStudy() {
-            const partDescription = document.getElementById('partDescription').value.trim();
-            const jobNo = document.getElementById('jobNo').value.trim();
             const date = document.getElementById('date').value;
-            const workCentre = document.getElementById('workCentre').value.trim();
-            const operator = document.getElementById('operator').value.trim();
-            const qty = parseFloat(document.getElementById('qty').value) || 0;
-            const operationNo = document.getElementById('operationNo').value.trim();
             const itemMasterNo = document.getElementById('itemMasterNo').value.trim();
+            const operator = document.getElementById('operator').value.trim();
 
-            if (!partDescription || !jobNo || !date || !workCentre || !operator || !operationNo) {
+            if (!date || !itemMasterNo || !operator) {
                 alert('Please fill in all required fields');
                 return;
             }
 
             state.session = {
-                partDescription,
-                jobNo,
                 date,
-                workCentre,
-                operator,
-                qty,
-                operationNo,
-                itemMasterNo
+                itemMasterNo,
+                operator
             };
 
             state.activities = [];
@@ -1658,20 +1602,15 @@
         // Export as CSV
         function exportCSV() {
             let csv = 'DIGITAL TIME STUDY REPORT\n\n';
-            csv += `Part Description,${state.session.partDescription}\n`;
-            csv += `Job No,${state.session.jobNo}\n`;
             csv += `Date,${state.session.date}\n`;
-            csv += `Work Centre,${state.session.workCentre}\n`;
-            csv += `Operator,${state.session.operator}\n`;
-            csv += `Qty,${state.session.qty}\n`;
-            csv += `Operation No,${state.session.operationNo}\n`;
-            csv += `Item Master No,${state.session.itemMasterNo || ''}\n\n`;
+            csv += `Item Master No,${state.session.itemMasterNo}\n`;
+            csv += `Operator,${state.session.operator}\n\n`;
 
-            csv += 'No,Operation,Description,OT,DIFF,NT,ST,Classification\n';
+            csv += 'No,Description,OT,DIFF,NT,ST,Classification\n';
             state.activities.forEach(activity => {
                 const nt = parseFloat((activity.diff * state.sessionRating / 100).toFixed(2));
                 const st = parseFloat((nt * (1 + state.sessionAllowance / 100)).toFixed(2));
-                csv += `${activity.no},${state.session.operationNo},"${activity.description}",${activity.ot.toFixed(2)},${activity.diff.toFixed(2)},${nt},${st},${activity.classification || ''}\n`;
+                csv += `${activity.no},"${activity.description}",${activity.ot.toFixed(2)},${activity.diff.toFixed(2)},${nt},${st},${activity.classification || ''}\n`;
             });
 
             csv += '\n\nPerformance Rating,' + state.sessionRating.toFixed(1) + '%\n';
@@ -2109,27 +2048,17 @@
         // Analytics functions
         function updateAnalytics() {
             const filterOperator = document.getElementById('filterOperator')?.value.toLowerCase() || '';
-            const filterWorkCentre = document.getElementById('filterWorkCentre')?.value.toLowerCase() || '';
-            const filterJobNo = document.getElementById('filterJobNo')?.value.toLowerCase() || '';
+            const filterItemMasterNo = document.getElementById('filterItemMasterNo')?.value.toLowerCase() || '';
             const filterDateFrom = document.getElementById('filterDateFrom')?.value || '';
             const filterDateTo = document.getElementById('filterDateTo')?.value || '';
-            const filterPart = document.getElementById('filterPart')?.value.toLowerCase() || '';
-            const filterOperation = document.getElementById('filterOperation')?.value.toLowerCase() || '';
-            const filterItemMasterNo = document.getElementById('filterItemMasterNo')?.value.toLowerCase() || '';
-            const filterQty = document.getElementById('filterQty')?.value.toLowerCase() || '';
 
             const sessions = JSON.parse(localStorage.getItem('timeSessions')) || [];
 
             let filtered = sessions.filter(session => {
                 if (filterOperator && !session.operator.toLowerCase().includes(filterOperator)) return false;
-                if (filterWorkCentre && !session.workCentre.toLowerCase().includes(filterWorkCentre)) return false;
-                if (filterJobNo && !session.jobNo.toLowerCase().includes(filterJobNo)) return false;
+                if (filterItemMasterNo && !((session.itemMasterNo || '').toLowerCase().includes(filterItemMasterNo))) return false;
                 if (filterDateFrom && session.date < filterDateFrom) return false;
                 if (filterDateTo && session.date > filterDateTo) return false;
-                if (filterPart && !session.partDescription.toLowerCase().includes(filterPart)) return false;
-                if (filterOperation && !session.operationNo.toLowerCase().includes(filterOperation)) return false;
-                if (filterItemMasterNo && !((session.itemMasterNo || '').toLowerCase().includes(filterItemMasterNo))) return false;
-                if (filterQty && !String(session.qty).toLowerCase().includes(filterQty)) return false;
                 return true;
             });
 
@@ -2224,25 +2153,15 @@
 
             // Apply the same filters as the analytics page
             const filterOperator = document.getElementById('filterOperator')?.value.toLowerCase() || '';
-            const filterWorkCentre = document.getElementById('filterWorkCentre')?.value.toLowerCase() || '';
-            const filterJobNo = document.getElementById('filterJobNo')?.value.toLowerCase() || '';
+            const filterItemMasterNo = document.getElementById('filterItemMasterNo')?.value.toLowerCase() || '';
             const filterDateFrom = document.getElementById('filterDateFrom')?.value || '';
             const filterDateTo = document.getElementById('filterDateTo')?.value || '';
-            const filterPart = document.getElementById('filterPart')?.value.toLowerCase() || '';
-            const filterOperation = document.getElementById('filterOperation')?.value.toLowerCase() || '';
-            const filterItemMasterNo = document.getElementById('filterItemMasterNo')?.value.toLowerCase() || '';
-            const filterQty = document.getElementById('filterQty')?.value.toLowerCase() || '';
 
             let filtered = sessions.filter(session => {
                 if (filterOperator && !session.operator.toLowerCase().includes(filterOperator)) return false;
-                if (filterWorkCentre && !session.workCentre.toLowerCase().includes(filterWorkCentre)) return false;
-                if (filterJobNo && !session.jobNo.toLowerCase().includes(filterJobNo)) return false;
+                if (filterItemMasterNo && !((session.itemMasterNo || '').toLowerCase().includes(filterItemMasterNo))) return false;
                 if (filterDateFrom && session.date < filterDateFrom) return false;
                 if (filterDateTo && session.date > filterDateTo) return false;
-                if (filterPart && !session.partDescription.toLowerCase().includes(filterPart)) return false;
-                if (filterOperation && !session.operationNo.toLowerCase().includes(filterOperation)) return false;
-                if (filterItemMasterNo && !((session.itemMasterNo || '').toLowerCase().includes(filterItemMasterNo))) return false;
-                if (filterQty && !String(session.qty).toLowerCase().includes(filterQty)) return false;
                 return true;
             });
 
@@ -2283,14 +2202,9 @@
 
         function clearFilters() {
             document.getElementById('filterOperator').value = '';
-            document.getElementById('filterWorkCentre').value = '';
-            document.getElementById('filterJobNo').value = '';
+            document.getElementById('filterItemMasterNo').value = '';
             document.getElementById('filterDateFrom').value = '';
             document.getElementById('filterDateTo').value = '';
-            document.getElementById('filterPart').value = '';
-            document.getElementById('filterOperation').value = '';
-            document.getElementById('filterItemMasterNo').value = '';
-            document.getElementById('filterQty').value = '';
             updateAnalytics();
         }
 
@@ -2475,34 +2389,22 @@
 
             // Apply the same filters as the analytics page
             const filterOperator = document.getElementById('filterOperator')?.value.toLowerCase() || '';
-            const filterWorkCentre = document.getElementById('filterWorkCentre')?.value.toLowerCase() || '';
-            const filterJobNo = document.getElementById('filterJobNo')?.value.toLowerCase() || '';
+            const filterItemMasterNo = document.getElementById('filterItemMasterNo')?.value.toLowerCase() || '';
             const filterDateFrom = document.getElementById('filterDateFrom')?.value || '';
             const filterDateTo = document.getElementById('filterDateTo')?.value || '';
-            const filterPart = document.getElementById('filterPart')?.value.toLowerCase() || '';
-            const filterOperation = document.getElementById('filterOperation')?.value.toLowerCase() || '';
-            const filterItemMasterNo = document.getElementById('filterItemMasterNo')?.value.toLowerCase() || '';
-            const filterQty = document.getElementById('filterQty')?.value.toLowerCase() || '';
 
             let sessions = allSessions.filter(session => {
                 if (filterOperator && !session.operator.toLowerCase().includes(filterOperator)) return false;
-                if (filterWorkCentre && !session.workCentre.toLowerCase().includes(filterWorkCentre)) return false;
-                if (filterJobNo && !session.jobNo.toLowerCase().includes(filterJobNo)) return false;
+                if (filterItemMasterNo && !((session.itemMasterNo || '').toLowerCase().includes(filterItemMasterNo))) return false;
                 if (filterDateFrom && session.date < filterDateFrom) return false;
                 if (filterDateTo && session.date > filterDateTo) return false;
-                if (filterPart && !session.partDescription.toLowerCase().includes(filterPart)) return false;
-                if (filterOperation && !session.operationNo.toLowerCase().includes(filterOperation)) return false;
-                if (filterItemMasterNo && !((session.itemMasterNo || '').toLowerCase().includes(filterItemMasterNo))) return false;
-                if (filterQty && !String(session.qty).toLowerCase().includes(filterQty)) return false;
                 return true;
             });
 
-            // Group by comparison type and calculate ST totals
+            // Group by operator and calculate ST totals
             const groups = {};
             sessions.forEach(session => {
-                const groupKey = compareBy === 'operator' ? session.operator :
-                                 compareBy === 'operation' ? session.operationNo :
-                                 session.partDescription;
+                const groupKey = session.operator;
 
                 if (!groups[groupKey]) {
                     groups[groupKey] = { internalST: 0, totalTime: 0, sessions: 0 };
@@ -2611,14 +2513,9 @@
 
         // Start new session
         function startNewSession() {
-            document.getElementById('partDescription').value = '';
-            document.getElementById('jobNo').value = '';
             document.getElementById('date').value = new Date().toISOString().split('T')[0];
-            document.getElementById('workCentre').value = '';
-            document.getElementById('operator').value = '';
-            document.getElementById('qty').value = '';
-            document.getElementById('operationNo').value = '';
             document.getElementById('itemMasterNo').value = '';
+            document.getElementById('operator').value = '';
             document.getElementById('activityInput').value = '';
             document.getElementById('sessionRating').value = '100';
             document.getElementById('sessionAllowance').value = '10';
