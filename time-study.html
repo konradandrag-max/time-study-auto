@@ -1541,7 +1541,10 @@
                         showMobileMenuBtn();
                         await initDarkMode();
                         await updateAnalytics();
-                        await loadDashboard();
+                        // Wait for DOM to be ready before loading dashboard
+                        setTimeout(async () => {
+                            await loadDashboard();
+                        }, 300);
                     } else {
                         document.getElementById('authScreen').style.display = 'flex';
                         document.getElementById('mainContainer').style.display = 'none';
