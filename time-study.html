@@ -807,6 +807,10 @@
             }
         }
 
+        #floatingButtonsContainer {
+            display: none !important;
+        }
+
         @media (max-width: 600px) {
             /* Hide original floating buttons on mobile and show menu button instead */
             #floatingButtonsContainer {
@@ -1894,9 +1898,7 @@
 
         function showMobileMenuBtn() {
             const btn = document.getElementById('mobileMenuBtn');
-            if (window.innerWidth <= 600) {
-                btn.classList.add('show');
-            }
+            btn.classList.add('show');
         }
 
         function hideMobileMenuBtn() {
