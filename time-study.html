@@ -2657,6 +2657,9 @@
 
         async function loadDashboard() {
             const sessions = await getFirestoreCollection('sessions') || [];
+            const starredDoc = await loadFromFirestore('settings', 'starredSessions') || { items: [] };
+            const starred = starredDoc.items || [];
+
             const now = new Date();
             const thirtyDaysAgo = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 30);
             const sevenDaysAgo = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7);
@@ -2738,7 +2741,6 @@
                 recentDiv.innerHTML = recentSessions.slice(0, 6).map((s, idx) => {
                     const eff = ((s.internalST || 0) / ((s.internalST || 0) + (s.externalTotal || 0) + (s.wasteTotal || 0)) * 100).toFixed(1);
                     const totalST = (s.internalST || 0) + (s.externalTotal || 0) + (s.wasteTotal || 0);
-                    const starred = JSON.parse(localStorage.getItem('starredSessions')) || [];
                     const isStarred = starred.some(st => st.date === s.date && st.operator === s.operator && st.itemMasterNo === s.itemMasterNo);
                     const starIcon = isStarred ? '⭐' : '☆';
                     return `
@@ -3092,9 +3094,10 @@
             showToast(`⭐ Starred sessions exported as CSV${dateRange}`);
         }
 
-        function exportAsJSON() {
-            let sessions = JSON.parse(localStorage.getItem('timeSessions')) || [];
-            const starred = JSON.parse(localStorage.getItem('starredSessions')) || [];
+        async function exportAsJSON() {
+            let sessions = await getFirestoreCollection('sessions') || [];
+            const starredDoc = await loadFromFirestore('settings', 'starredSessions') || { items: [] };
+            const starred = starredDoc.items || [];
             const filterDateFrom = document.getElementById('filterDateFrom')?.value || '';
             const filterDateTo = document.getElementById('filterDateTo')?.value || '';
 
@@ -3283,10 +3286,10 @@
             }
         }
 
-        function updateComparison() {
+        async function updateComparison() {
             const compareBy = document.getElementById('compareBy').value;
             const items = document.getElementById('compareItems').value.split(',').map(i => i.trim()).filter(i => i);
-            const sessions = JSON.parse(localStorage.getItem('timeSessions')) || [];
+            const sessions = await getFirestoreCollection('sessions') || [];
 
             if (items.length === 0) {
                 document.getElementById('comparisonResults').innerHTML = '<p style="color: #666;">Enter items to compare</p>';
