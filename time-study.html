@@ -1891,7 +1891,13 @@
 
         function showMobileMenuBtn() {
             const btn = document.getElementById('mobileMenuBtn');
-            btn.classList.add('show');
+            console.log('showMobileMenuBtn called, btn:', btn);
+            if (btn) {
+                btn.classList.add('show');
+                console.log('Menu button show class added');
+            } else {
+                console.error('Menu button element not found!');
+            }
         }
 
         function hideMobileMenuBtn() {
