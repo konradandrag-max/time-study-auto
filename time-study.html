@@ -1275,7 +1275,7 @@
         <!-- Session Details Screen -->
         <div class="screen" id="sessionDetailsScreen">
             <h1>Session Details</h1>
-            <div style="background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #e0e0e0;">
+            <div style="background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #e0e0e0;" id="detailsHeaderDisplay">
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
                     <div>
                         <label style="color: #666; font-size: 12px;">Item Master No</label>
@@ -1290,12 +1290,30 @@
                         <div style="font-size: 18px; font-weight: bold;" id="detailDate">-</div>
                     </div>
                     <div>
-                        <label style="color: #666; font-size: 12px;">Performance Rating</label>
+                        <label style="color: #666; font-size: 12px;">Performance Rating (%)</label>
                         <div style="font-size: 18px; font-weight: bold;" id="detailRating">-</div>
+                    </div>
+                    <div>
+                        <label style="color: #666; font-size: 12px;">Allowance (%)</label>
+                        <div style="font-size: 18px; font-weight: bold;" id="detailAllowance">-</div>
                     </div>
                     <div>
                         <label style="color: #666; font-size: 12px;">Standard Time (ST)</label>
                         <div style="font-size: 18px; font-weight: bold; color: #28a745;" id="detailST">-</div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="background: #e3f2fd; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #90caf9; display: none;" id="detailsHeaderEdit">
+                <h3 style="margin-bottom: 15px;">Edit Session Details</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px;">
+                    <div>
+                        <label style="color: #333; font-size: 12px;">Performance Rating (%)</label>
+                        <input type="number" id="editDetailRating" style="width: 100%; padding: 8px; border: 2px solid #90caf9; border-radius: 4px;" min="0" max="200">
+                    </div>
+                    <div>
+                        <label style="color: #333; font-size: 12px;">Allowance (%)</label>
+                        <input type="number" id="editDetailAllowance" style="width: 100%; padding: 8px; border: 2px solid #90caf9; border-radius: 4px;" min="0" max="100">
                     </div>
                 </div>
             </div>
@@ -2541,6 +2559,7 @@
             document.getElementById('detailOperator').textContent = session.operator;
             document.getElementById('detailDate').textContent = session.date;
             document.getElementById('detailRating').textContent = session.sessionRating + '%';
+            document.getElementById('detailAllowance').textContent = (session.sessionAllowance || 0) + '%';
 
             const totalST = (session.internalST || 0) + (session.externalTotal || 0) + (session.wasteTotal || 0);
             document.getElementById('detailST').textContent = totalST.toFixed(2);
@@ -2598,14 +2617,30 @@
             document.getElementById('editStudyBtn').style.display = 'none';
             document.getElementById('saveStudyBtn').style.display = 'inline-block';
 
+            // Show edit form for rating and allowance
+            document.getElementById('detailsHeaderDisplay').style.display = 'none';
+            document.getElementById('detailsHeaderEdit').style.display = 'block';
+
+            // Get current values
+            const ratingText = document.getElementById('detailRating').textContent.replace('%', '').trim();
+            const allowanceText = document.getElementById('detailAllowance').textContent.replace('%', '').trim();
+            document.getElementById('editDetailRating').value = ratingText || 100;
+            document.getElementById('editDetailAllowance').value = allowanceText || 0;
+
             // Make activities table editable
             const tbody = document.querySelector('#detailActivitiesTable tbody');
             const rows = tbody.querySelectorAll('tr');
             rows.forEach((row, idx) => {
+                // Make description editable
+                const descCell = row.cells[1];
+                const currentDesc = descCell.textContent;
+                descCell.innerHTML = `<input type="text" id="activity_desc_${idx}" value="${currentDesc}" style="width: 100%; padding: 4px; font-size: 12px;">`;
+
+                // Make classification editable
                 const typeCell = row.cells[6];
                 const currentType = typeCell.textContent.trim();
                 typeCell.innerHTML = `
-                    <select onchange="updateActivityType(${idx}, this.value)" style="padding: 4px; font-size: 12px;">
+                    <select id="activity_type_${idx}" style="padding: 4px; font-size: 12px;">
                         <option value="Internal" ${currentType === 'Internal' ? 'selected' : ''}>Internal</option>
                         <option value="External" ${currentType === 'External' ? 'selected' : ''}>External</option>
                         <option value="Waste" ${currentType === 'Waste' ? 'selected' : ''}>Waste</option>
@@ -2614,7 +2649,7 @@
                 `;
             });
 
-            showToast('✏️ Edit mode enabled - modify classifications and save');
+            showToast('✏️ Edit mode enabled - modify all fields and save');
         }
 
         function updateActivityType(activityIndex, newType) {
@@ -2625,9 +2660,11 @@
         async function saveEditedSession() {
             if (!currentViewingSession) return;
 
+            // Get edited values
+            const newRating = parseInt(document.getElementById('editDetailRating').value) || 100;
+            const newAllowance = parseInt(document.getElementById('editDetailAllowance').value) || 0;
             const tbody = document.querySelector('#detailActivitiesTable tbody');
             const rows = tbody.querySelectorAll('tr');
-            const newActivities = [];
 
             // Get current session data from Firestore
             const sessions = await getFirestoreCollection('sessions') || [];
@@ -2639,24 +2676,29 @@
 
             if (!session) return;
 
-            // Update activity classifications from the edited table
+            // Update session rating and allowance
+            session.sessionRating = newRating;
+            session.sessionAllowance = newAllowance;
+
+            // Update activities from the edited table
             session.activities.forEach((activity, idx) => {
                 if (rows[idx]) {
-                    const selectEl = rows[idx].querySelector('select');
-                    if (selectEl) {
-                        activity.classification = selectEl.value;
-                    }
+                    const descInput = document.getElementById(`activity_desc_${idx}`);
+                    const typeSelect = document.getElementById(`activity_type_${idx}`);
+                    if (descInput) activity.description = descInput.value;
+                    if (typeSelect) activity.classification = typeSelect.value;
                 }
             });
 
-            // Recalculate totals
-            let internalST = 0, externalTotal = 0, wasteTotal = 0;
+            // Recalculate totals with new rating and allowance
+            let internalST = 0, externalTotal = 0, wasteTotal = 0, delayTotal = 0;
             session.activities.forEach(activity => {
                 const nt = (activity.diff * session.sessionRating / 100);
                 const st = nt * (1 + session.sessionAllowance / 100);
                 if (activity.classification === 'Internal') internalST += st;
                 else if (activity.classification === 'External') externalTotal += st;
                 else if (activity.classification === 'Waste') wasteTotal += st;
+                else if (activity.classification === 'Delay') delayTotal += st;
             });
 
             session.internalST = internalST;
@@ -2670,8 +2712,10 @@
             // Exit edit mode
             document.getElementById('editStudyBtn').style.display = 'inline-block';
             document.getElementById('saveStudyBtn').style.display = 'none';
+            document.getElementById('detailsHeaderDisplay').style.display = 'block';
+            document.getElementById('detailsHeaderEdit').style.display = 'none';
 
-            showToast('💾 Study saved successfully', 'success');
+            showToast('💾 Study updated successfully', 'success');
 
             // Refresh the display
             await viewSessionDetailsFromAnalytics(currentViewingSession.date, currentViewingSession.itemMasterNo, currentViewingSession.operator);
@@ -2721,6 +2765,7 @@
             document.getElementById('detailOperator').textContent = session.operator;
             document.getElementById('detailDate').textContent = session.date;
             document.getElementById('detailRating').textContent = session.sessionRating + '%';
+            document.getElementById('detailAllowance').textContent = (session.sessionAllowance || 0) + '%';
 
             const totalST = (session.internalST || 0) + (session.externalTotal || 0) + (session.wasteTotal || 0);
             document.getElementById('detailST').textContent = totalST.toFixed(2);
