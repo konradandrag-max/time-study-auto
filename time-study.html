@@ -1623,7 +1623,7 @@
     <!-- Floating DO TIME STUDY button -->
     <button id="floatingStudyBtn" onclick="switchScreen('screen1')" style="
         position: fixed;
-        bottom: 90px;
+        bottom: 100px;
         right: 20px;
         padding: 15px 25px;
         font-size: 16px;
@@ -1636,7 +1636,7 @@
         font-weight: bold;
         white-space: nowrap;
         z-index: 999;
-        display: none;
+        display: none !important;
     ">➕ DO TIME STUDY</button>
 
     <!-- Mobile Menu Button -->
@@ -1815,7 +1815,7 @@
                 btn.classList.add('show');
             }
             if (studyBtn) {
-                studyBtn.style.display = 'block';
+                studyBtn.style.setProperty('display', 'block', 'important');
             }
         }
 
@@ -1826,7 +1826,7 @@
                 btn.classList.remove('show');
             }
             if (studyBtn) {
-                studyBtn.style.display = 'none';
+                studyBtn.style.setProperty('display', 'none', 'important');
             }
             closeMobileMenu();
         }
