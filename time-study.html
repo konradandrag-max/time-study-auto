@@ -36,11 +36,189 @@
             justify-content: center;
             min-height: 100vh;
             padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
 
         #authScreen > div {
             width: 100%;
-            max-width: 400px;
+            max-width: 420px;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        body.dark-mode #authScreen {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+        }
+
+        body.dark-mode #authScreen > div {
+            background: #2d2d2d;
+            color: #e0e0e0;
+        }
+
+        #authScreen h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 32px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        body.dark-mode #authScreen h1 {
+            -webkit-text-fill-color: #667eea;
+        }
+
+        #authScreen h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 20px;
+            color: #333;
+        }
+
+        body.dark-mode #authScreen h2 {
+            color: #e0e0e0;
+        }
+
+        #authScreen .form-group {
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        #authScreen .form-field {
+            width: 100%;
+        }
+
+        #authScreen label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        body.dark-mode #authScreen label {
+            color: #aaa;
+        }
+
+        #authScreen input {
+            width: 100%;
+            padding: 12px 14px;
+            font-size: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            background-color: #f9f9f9;
+        }
+
+        body.dark-mode #authScreen input {
+            background-color: #333;
+            border-color: #555;
+            color: #e0e0e0;
+        }
+
+        #authScreen input:focus {
+            outline: none;
+            border-color: #667eea;
+            background-color: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        body.dark-mode #authScreen input:focus {
+            background-color: #3a3a3a;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        }
+
+        #authScreen button {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        #authScreen button:first-of-type {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        #authScreen button:first-of-type:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        #authScreen button:last-of-type {
+            background-color: #28a745;
+            color: white;
+        }
+
+        #authScreen button:last-of-type:hover {
+            background-color: #218838;
+            transform: translateY(-2px);
+        }
+
+        #authScreen p {
+            text-align: center;
+            margin: 20px 0 12px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        body.dark-mode #authScreen p {
+            color: #999;
+        }
+
+        #authScreen #loginError,
+        #authScreen #signupError {
+            background-color: #fee;
+            color: #c33;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-size: 13px;
+            border-left: 4px solid #c33;
+        }
+
+        body.dark-mode #authScreen #loginError,
+        body.dark-mode #authScreen #signupError {
+            background-color: #3a1f1f;
+            color: #ff9999;
+            border-left-color: #ff9999;
+        }
+
+        @media (max-width: 480px) {
+            #authScreen > div {
+                padding: 30px 20px;
+                border-radius: 8px;
+            }
+
+            #authScreen h1 {
+                font-size: 26px;
+                margin-bottom: 20px;
+            }
+
+            #authScreen h2 {
+                font-size: 18px;
+                margin-bottom: 20px;
+            }
+
+            #authScreen input {
+                padding: 11px 12px;
+                font-size: 16px;
+            }
+
+            #authScreen button {
+                padding: 11px;
+                font-size: 14px;
+            }
         }
 
         .screen {
