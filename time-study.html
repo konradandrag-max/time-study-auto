@@ -2959,7 +2959,7 @@
 
 
             // Update ST comparison chart
-            updateSTComparison();
+            await updateSTComparison();
 
             // Update activity breakdown chart
             updateActivityBreakdown();
@@ -3201,8 +3201,8 @@
             }
         }
 
-        function updateSTComparison() {
-            let allSessions = JSON.parse(localStorage.getItem('timeSessions')) || [];
+        async function updateSTComparison() {
+            let allSessions = await getFirestoreCollection('sessions') || [];
             const compareBy = document.getElementById('stCompareBy').value;
 
             // Apply the same filters as the analytics page
