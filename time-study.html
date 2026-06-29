@@ -78,7 +78,7 @@
 
         .form-field {
             flex: 1;
-            min-width: 200px;
+            min-width: 120px;
         }
 
         label {
@@ -95,7 +95,8 @@
             padding: 12px;
             border: 2px solid #ccc;
             border-radius: 4px;
-            font-size: 14px;
+            font-size: 16px;
+            min-height: 44px;
         }
 
         input[type="text"]:focus,
@@ -124,6 +125,10 @@
             color: white;
             transition: background-color 0.3s;
             white-space: nowrap;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         button:hover {
@@ -379,10 +384,11 @@
         }
 
         .classification-buttons button {
-            padding: 8px 10px;
-            font-size: 12px;
+            padding: 10px 12px;
+            font-size: 13px;
             flex: 1;
             min-width: 60px;
+            min-height: 44px;
             color: white;
             font-weight: bold;
             margin: 0;
@@ -530,73 +536,179 @@
             }
             .screen {
                 padding: 15px;
+                border-radius: 4px;
             }
             h1 {
-                font-size: 20px;
-                margin-bottom: 15px;
+                font-size: 22px;
+                margin-bottom: 20px;
             }
             h2 {
                 font-size: 16px;
+                margin-bottom: 12px;
+            }
+            h3 {
+                font-size: 15px;
             }
             button {
-                padding: 10px 15px;
-                font-size: 14px;
+                padding: 12px 16px;
+                font-size: 15px;
+                min-height: 44px;
             }
             #timerDisplay {
-                font-size: 36px;
+                font-size: 40px;
+                margin-bottom: 20px;
             }
             #floatingStudyBtn, #darkModeBtn {
                 padding: 12px 20px;
                 font-size: 14px;
+                min-height: 44px;
+            }
+            input[type="text"],
+            input[type="date"],
+            input[type="number"] {
+                font-size: 16px;
+                padding: 12px;
+                min-height: 44px;
+            }
+            table {
+                font-size: 13px;
+            }
+            table th, table td {
+                padding: 10px 6px;
+            }
+            .form-group {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .form-field {
+                min-width: unset;
+                flex: 1 1 100%;
+            }
+            .button-group {
+                flex-direction: column;
+                gap: 8px;
+            }
+            .button-group button {
+                width: 100%;
+            }
+            .activity-input-group {
+                flex-direction: column;
+                gap: 8px;
+            }
+            .activity-input-group input, .activity-input-group button {
+                width: 100%;
+            }
+            .classification-buttons {
+                flex-direction: row;
+                gap: 6px;
+            }
+            .classification-buttons button {
+                min-height: 44px;
+                padding: 12px 8px;
+            }
+            .summary-section {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+                padding: 15px;
+            }
+            .summary-item .value {
+                font-size: 22px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 8px;
+            }
+            .screen {
+                padding: 12px;
+            }
+            h1 {
+                font-size: 20px;
+                margin-bottom: 16px;
+            }
+            h2 {
+                font-size: 15px;
+            }
+            h3 {
+                font-size: 14px;
+            }
+            #timerDisplay {
+                font-size: 32px;
+                margin-bottom: 16px;
+            }
+            #darkModeBtn, #floatingStudyBtn {
+                padding: 11px 16px;
+                font-size: 13px;
+                min-height: 44px;
+            }
+            button {
+                padding: 12px 14px;
+                font-size: 14px;
+                min-height: 44px;
+            }
+            #logActivityBtn {
+                padding: 16px 20px;
+                font-size: 16px;
+                min-height: 50px;
+            }
+            input[type="text"],
+            input[type="date"],
+            input[type="number"] {
+                font-size: 16px;
             }
             table {
                 font-size: 12px;
             }
             table th, table td {
-                padding: 8px 5px;
-            }
-            .form-group {
-                grid-template-columns: 1fr;
-            }
-            .button-group {
-                flex-direction: column;
-            }
-            .button-group button {
-                width: 100%;
-                margin: 5px 0;
-            }
-            .activity-input-group {
-                flex-direction: column;
-            }
-            .activity-input-group input, .activity-input-group button {
-                width: 100%;
-                margin: 5px 0;
-            }
-            .classification-buttons {
-                flex-direction: row;
+                padding: 8px 4px;
             }
             .summary-section {
-                grid-template-columns: repeat(2, 1fr);
+                grid-template-columns: 1fr;
                 gap: 10px;
+                padding: 12px;
+            }
+            .summary-item .value {
+                font-size: 20px;
+            }
+            .classification-buttons button {
+                font-size: 11px;
+                padding: 10px 6px;
+                min-height: 40px;
+            }
+            .export-buttons {
+                flex-direction: column;
+                gap: 8px;
+            }
+            .export-buttons button {
+                width: 100%;
+                min-width: unset;
             }
         }
 
-        @media (max-width: 480px) {
+        @media (max-width: 360px) {
+            body {
+                font-size: 13px;
+            }
             h1 {
                 font-size: 18px;
+                margin-bottom: 12px;
+            }
+            h2 {
+                font-size: 14px;
             }
             #timerDisplay {
                 font-size: 28px;
             }
-            #darkModeBtn, #floatingStudyBtn {
-                padding: 10px 15px;
+            .classification-buttons button {
+                font-size: 10px;
+                padding: 8px 4px;
+                min-height: 38px;
+            }
+            button {
+                padding: 10px 12px;
                 font-size: 13px;
-            }
-            table {
-                font-size: 11px;
-            }
-            .summary-section {
-                grid-template-columns: 1fr;
+                min-height: 40px;
             }
         }
     </style>
