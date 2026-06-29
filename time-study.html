@@ -2611,45 +2611,70 @@
         let editingSessionIndex = null;
 
         function enableEditMode() {
-            if (!currentViewingSession) return;
+            try {
+                if (!currentViewingSession) {
+                    showToast('No study loaded', 'error');
+                    return;
+                }
 
-            editingSession = { ...currentViewingSession };
-            document.getElementById('editStudyBtn').style.display = 'none';
-            document.getElementById('saveStudyBtn').style.display = 'inline-block';
+                editingSession = { ...currentViewingSession };
 
-            // Show edit form for rating and allowance
-            document.getElementById('detailsHeaderDisplay').style.display = 'none';
-            document.getElementById('detailsHeaderEdit').style.display = 'block';
+                // Toggle buttons
+                const editBtn = document.getElementById('editStudyBtn');
+                const saveBtn = document.getElementById('saveStudyBtn');
+                if (editBtn) editBtn.style.display = 'none';
+                if (saveBtn) saveBtn.style.display = 'inline-block';
 
-            // Get current values
-            const ratingText = document.getElementById('detailRating').textContent.replace('%', '').trim();
-            const allowanceText = document.getElementById('detailAllowance').textContent.replace('%', '').trim();
-            document.getElementById('editDetailRating').value = ratingText || 100;
-            document.getElementById('editDetailAllowance').value = allowanceText || 0;
+                // Show edit form for rating and allowance
+                const displayHeader = document.getElementById('detailsHeaderDisplay');
+                const editHeader = document.getElementById('detailsHeaderEdit');
+                if (displayHeader) displayHeader.style.display = 'none';
+                if (editHeader) editHeader.style.display = 'block';
 
-            // Make activities table editable
-            const tbody = document.querySelector('#detailActivitiesTable tbody');
-            const rows = tbody.querySelectorAll('tr');
-            rows.forEach((row, idx) => {
-                // Make description editable
-                const descCell = row.cells[1];
-                const currentDesc = descCell.textContent;
-                descCell.innerHTML = `<input type="text" id="activity_desc_${idx}" value="${currentDesc}" style="width: 100%; padding: 4px; font-size: 12px;">`;
+                // Get current values
+                const ratingEl = document.getElementById('detailRating');
+                const allowanceEl = document.getElementById('detailAllowance');
+                const ratingText = ratingEl ? ratingEl.textContent.replace('%', '').trim() : '100';
+                const allowanceText = allowanceEl ? allowanceEl.textContent.replace('%', '').trim() : '0';
 
-                // Make classification editable
-                const typeCell = row.cells[6];
-                const currentType = typeCell.textContent.trim();
-                typeCell.innerHTML = `
-                    <select id="activity_type_${idx}" style="padding: 4px; font-size: 12px;">
-                        <option value="Internal" ${currentType === 'Internal' ? 'selected' : ''}>Internal</option>
-                        <option value="External" ${currentType === 'External' ? 'selected' : ''}>External</option>
-                        <option value="Waste" ${currentType === 'Waste' ? 'selected' : ''}>Waste</option>
-                        <option value="Delay" ${currentType === 'Delay' ? 'selected' : ''}>Delay</option>
-                    </select>
-                `;
-            });
+                const editRatingEl = document.getElementById('editDetailRating');
+                const editAllowanceEl = document.getElementById('editDetailAllowance');
+                if (editRatingEl) editRatingEl.value = ratingText || 100;
+                if (editAllowanceEl) editAllowanceEl.value = allowanceText || 0;
 
-            showToast('✏️ Edit mode enabled - modify all fields and save');
+                // Make activities table editable
+                const tbody = document.querySelector('#detailActivitiesTable tbody');
+                if (tbody) {
+                    const rows = tbody.querySelectorAll('tr');
+                    rows.forEach((row, idx) => {
+                        // Make description editable
+                        const descCell = row.cells[1];
+                        if (descCell) {
+                            const currentDesc = descCell.textContent.trim();
+                            descCell.innerHTML = `<input type="text" id="activity_desc_${idx}" value="${currentDesc.replace(/"/g, '&quot;')}" style="width: 100%; padding: 4px; font-size: 12px;">`;
+                        }
+
+                        // Make classification editable
+                        const typeCell = row.cells[6];
+                        if (typeCell) {
+                            const currentType = typeCell.textContent.trim();
+                            typeCell.innerHTML = `
+                                <select id="activity_type_${idx}" style="padding: 4px; font-size: 12px;">
+                                    <option value="Internal" ${currentType === 'Internal' ? 'selected' : ''}>Internal</option>
+                                    <option value="External" ${currentType === 'External' ? 'selected' : ''}>External</option>
+                                    <option value="Waste" ${currentType === 'Waste' ? 'selected' : ''}>Waste</option>
+                                    <option value="Delay" ${currentType === 'Delay' ? 'selected' : ''}>Delay</option>
+                                </select>
+                            `;
+                        }
+                    });
+                }
+
+                showToast('✏️ Edit mode enabled - modify all fields and save');
+            } catch (error) {
+                console.error('Edit mode error:', error);
+                showToast('Error enabling edit mode', 'error');
+            }
         }
 
         function updateActivityType(activityIndex, newType) {
