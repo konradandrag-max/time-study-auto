@@ -1690,6 +1690,23 @@
             white-space: nowrap;
         ">📊 View Historical Data</button>
 
+        <!-- Import Study button -->
+        <button onclick="document.getElementById('importFileInput').click()" style="
+            padding: 15px 20px;
+            font-size: 16px;
+            background-color: #6f42c1;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            font-weight: bold;
+            white-space: nowrap;
+        ">📥 Import Study</button>
+
+        <!-- Hidden file input -->
+        <input type="file" id="importFileInput" accept=".json" style="display: none;" onchange="handleImportFile(event)">
+
         <!-- Floating DO TIME STUDY button -->
         <button id="floatingStudyBtn" onclick="switchScreen('screen1')" style="
             padding: 15px 25px;
@@ -3305,6 +3322,47 @@
             document.body.removeChild(link);
             const dateRange = (filterDateFrom || filterDateTo) ? ` (${filterDateFrom || 'start'} to ${filterDateTo || 'end'})` : '';
             showToast(`💾 Data exported as JSON${dateRange}`);
+        }
+
+        async function handleImportFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            try {
+                const text = await file.text();
+                const data = JSON.parse(text);
+
+                if (!data.sessions || !Array.isArray(data.sessions)) {
+                    showToast('Invalid file format - no sessions found', 'error');
+                    return;
+                }
+
+                let importedCount = 0;
+                for (const session of data.sessions) {
+                    if (!session.date || !session.itemMasterNo || !session.operator) {
+                        continue;
+                    }
+
+                    const sessionId = `${session.date}_${session.itemMasterNo}_${session.operator}`;
+                    await saveToFirestore('sessions', sessionId, session);
+                    importedCount++;
+                }
+
+                // Reset file input
+                event.target.value = '';
+
+                showToast(`✅ Imported ${importedCount} study/studies successfully`, 'success');
+
+                // Refresh dashboard
+                if (currentUser) {
+                    await updateAnalytics();
+                    await loadDashboard();
+                }
+            } catch (error) {
+                console.error('Import error:', error);
+                event.target.value = '';
+                showToast('Error importing file - make sure it\'s a valid JSON export', 'error');
+            }
         }
 
         async function updateDashboardSTChart() {
