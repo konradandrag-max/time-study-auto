@@ -753,7 +753,12 @@
             font-size: 24px !important;
             cursor: pointer !important;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
-            display: none !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            visibility: hidden !important;
+            opacity: 0 !important;
+            transition: opacity 0.3s ease !important;
         }
 
         #mobileMenuBtn:active {
@@ -761,9 +766,8 @@
         }
 
         #mobileMenuBtn.show {
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
+            visibility: visible !important;
+            opacity: 1 !important;
         }
 
         /* Mobile menu panel */
