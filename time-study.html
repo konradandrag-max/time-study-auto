@@ -1310,7 +1310,7 @@
                 ot: parseFloat(ot.toFixed(2)),
                 diff: parseFloat(diff.toFixed(2)),
                 nt: parseFloat(diff.toFixed(2)),
-                classification: null
+                classification: 'Internal'
             });
 
             document.getElementById('activityInput').value = '';
@@ -1549,8 +1549,7 @@
 
         // Set classification for an activity
         function setClassification(index, classification) {
-            const newClassification = state.activities[index].classification === classification ? null : classification;
-            state.activities[index].classification = newClassification;
+            state.activities[index].classification = classification;
 
             // Update buttons in the table
             const rows = document.querySelector('#activitiesTable3 tbody').rows;
@@ -1558,9 +1557,10 @@
                 const buttons = rows[index].querySelectorAll('.classification-buttons button');
                 buttons.forEach((btn, btnIndex) => {
                     btn.classList.remove('active');
-                    if (newClassification === 'Internal' && btnIndex === 0) btn.classList.add('active');
-                    if (newClassification === 'External' && btnIndex === 1) btn.classList.add('active');
-                    if (newClassification === 'Waste' && btnIndex === 2) btn.classList.add('active');
+                    if (classification === 'Internal' && btnIndex === 0) btn.classList.add('active');
+                    if (classification === 'External' && btnIndex === 1) btn.classList.add('active');
+                    if (classification === 'Waste' && btnIndex === 2) btn.classList.add('active');
+                    if (classification === 'Delay' && btnIndex === 3) btn.classList.add('active');
                 });
             }
 
