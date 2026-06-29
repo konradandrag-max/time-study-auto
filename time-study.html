@@ -2849,7 +2849,7 @@
             }
 
             // Update dashboard ST chart
-            updateDashboardSTChart();
+            await updateDashboardSTChart();
         }
 
         // Go back to previous screen
@@ -3126,8 +3126,8 @@
             showToast(`💾 Data exported as JSON${dateRange}`);
         }
 
-        function updateDashboardSTChart() {
-            const sessions = JSON.parse(localStorage.getItem('timeSessions')) || [];
+        async function updateDashboardSTChart() {
+            const sessions = await getFirestoreCollection('sessions') || [];
             const now = new Date();
             const sevenDaysAgo = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7);
             const sevenDaysStr = sevenDaysAgo.toISOString().split('T')[0];
