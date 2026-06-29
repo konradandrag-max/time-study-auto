@@ -559,6 +559,62 @@
             min-width: 120px;
         }
 
+        /* Hamburger menu button */
+        #mobileMenuBtn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 56px;
+            height: 56px;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            display: none;
+        }
+
+        #mobileMenuBtn:active {
+            transform: scale(0.95);
+        }
+
+        #mobileMenuBtn.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Mobile menu panel */
+        #mobileMenuPanel {
+            position: fixed;
+            bottom: 0;
+            right: 0;
+            left: 0;
+            max-height: 0;
+            overflow: hidden;
+            background-color: #f5f5f5;
+            border-top: 1px solid #e0e0e0;
+            z-index: 999;
+            transition: max-height 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            padding: 10px;
+        }
+
+        #mobileMenuPanel.active {
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        body.dark-mode #mobileMenuPanel {
+            background-color: #2d2d2d;
+            border-top-color: #444;
+        }
+
         @media (max-width: 768px) {
             [style*="position: fixed; bottom: 0"] {
                 flex-direction: column;
@@ -572,11 +628,36 @@
             }
         }
 
+        @media (max-width: 600px) {
+            /* Hide original button bar on mobile and show menu button instead */
+            [style*="position: fixed; bottom: 0"] {
+                display: none;
+            }
+        }
+
         @media (max-width: 480px) {
             [style*="position: fixed; bottom: 0"] {
                 gap: 4px;
             }
             [style*="position: fixed; bottom: 0"] button {
+                padding: 10px 8px !important;
+                font-size: 11px !important;
+                min-height: 36px;
+            }
+
+            #mobileMenuBtn {
+                width: 50px;
+                height: 50px;
+                bottom: 15px;
+                right: 15px;
+            }
+
+            #mobileMenuPanel {
+                padding: 8px;
+                gap: 4px;
+            }
+
+            #mobileMenuPanel button {
                 padding: 10px 8px !important;
                 font-size: 11px !important;
                 min-height: 36px;
@@ -1403,6 +1484,19 @@
         ">➕ DO TIME STUDY</button>
     </div>
 
+    <!-- Mobile Menu Button -->
+    <button id="mobileMenuBtn" onclick="toggleMobileMenu()">☰</button>
+
+    <!-- Mobile Menu Panel -->
+    <div id="mobileMenuPanel">
+        <button onclick="toggleMobileMenu(); switchScreen('screen1')" style="background-color: #007bff; width: 100%;">➕ DO TIME STUDY</button>
+        <button onclick="toggleMobileMenu(); switchScreen('homeScreen')" style="background-color: #6c757d; width: 100%;">🏠 Home</button>
+        <button onclick="toggleMobileMenu(); toggleDarkMode()" style="background-color: #6c757d; width: 100%;" id="darkModeBtnMobile">🌙 Dark</button>
+        <button onclick="toggleMobileMenu(); openSettings()" style="background-color: #6c757d; width: 100%;">⚙️ Settings</button>
+        <button onclick="toggleMobileMenu(); switchScreen('analyticsScreen')" style="background-color: #17a2b8; width: 100%;">📊 Historical Data</button>
+        <button onclick="toggleMobileMenu(); handleLogout()" style="background-color: #dc3545; width: 100%;">🚪 Logout</button>
+    </div>
+
     <!-- Copyright Footer -->
     <div style="position: fixed; bottom: 0; left: 0; right: 0; background-color: #f5f5f5; padding: 10px; text-align: center; font-size: 12px; color: #666; border-top: 1px solid #e0e0e0; z-index: 999;">
         © 2026 Konrad Andrag. All rights reserved.
@@ -1443,11 +1537,13 @@
                     if (user) {
                         document.getElementById('authScreen').style.display = 'none';
                         document.getElementById('mainContainer').style.display = 'block';
+                        showMobileMenuBtn();
                         await initDarkMode();
                         await updateAnalytics();
                     } else {
                         document.getElementById('authScreen').style.display = 'flex';
                         document.getElementById('mainContainer').style.display = 'none';
+                        hideMobileMenuBtn();
                     }
                 });
 
@@ -1536,8 +1632,33 @@
 
         function handleLogout() {
             if (confirm('Are you sure you want to logout?')) {
+                closeMobileMenu();
                 auth.signOut();
             }
+        }
+
+        // Mobile Menu Functions
+        function toggleMobileMenu() {
+            const panel = document.getElementById('mobileMenuPanel');
+            panel.classList.toggle('active');
+        }
+
+        function closeMobileMenu() {
+            const panel = document.getElementById('mobileMenuPanel');
+            panel.classList.remove('active');
+        }
+
+        function showMobileMenuBtn() {
+            const btn = document.getElementById('mobileMenuBtn');
+            if (window.innerWidth <= 600) {
+                btn.classList.add('show');
+            }
+        }
+
+        function hideMobileMenuBtn() {
+            const btn = document.getElementById('mobileMenuBtn');
+            btn.classList.remove('show');
+            closeMobileMenu();
         }
 
         // Firestore Helper Functions
@@ -1838,7 +1959,10 @@
             document.body.classList.toggle('dark-mode');
             const isDark = document.body.classList.contains('dark-mode');
             await saveToFirestore('settings', 'preferences', { darkMode: isDark });
-            document.getElementById('darkModeBtn').textContent = isDark ? '☀️ Light' : '🌙 Dark';
+            const btnText = isDark ? '☀️ Light' : '🌙 Dark';
+            document.getElementById('darkModeBtn').textContent = btnText;
+            const mobileBtnMobile = document.getElementById('darkModeBtnMobile');
+            if (mobileBtnMobile) mobileBtnMobile.textContent = btnText;
             showToast(isDark ? '🌙 Dark mode enabled' : '☀️ Light mode enabled');
         }
 
@@ -1848,6 +1972,8 @@
             if (isDark) {
                 document.body.classList.add('dark-mode');
                 document.getElementById('darkModeBtn').textContent = '☀️ Light';
+                const mobileBtnMobile = document.getElementById('darkModeBtnMobile');
+                if (mobileBtnMobile) mobileBtnMobile.textContent = '☀️ Light';
             }
         }
 
@@ -2186,6 +2312,7 @@
                 screen.classList.remove('active');
             });
             document.getElementById(screenId).classList.add('active');
+            closeMobileMenu();
 
             // Show/hide back button based on screen
             const backBtn = document.getElementById('floatingBackBtn');
