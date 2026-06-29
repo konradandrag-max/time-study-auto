@@ -1319,8 +1319,10 @@
             </div>
 
             <div class="button-group">
-                <button class="back-button" onclick="switchScreen('homeScreen')">← Back to Dashboard</button>
-                <button onclick="deleteCurrentSession()" style="background-color: #dc3545; flex: 1;">🗑️ Delete Study</button>
+                <button class="back-button" onclick="switchScreen('homeScreen')">← Back</button>
+                <button id="editStudyBtn" onclick="enableEditMode()" style="background-color: #ffc107; flex: 1; color: black;">✏️ Edit</button>
+                <button id="saveStudyBtn" onclick="saveEditedSession()" style="background-color: #28a745; flex: 1; display: none;">💾 Save</button>
+                <button onclick="deleteCurrentSession()" style="background-color: #dc3545; flex: 1;">🗑️ Delete</button>
             </div>
         </div>
 
@@ -2584,6 +2586,96 @@
                 confirmAction();
             }
             closeConfirm();
+        }
+
+        let editingSession = null;
+        let editingSessionIndex = null;
+
+        function enableEditMode() {
+            if (!currentViewingSession) return;
+
+            editingSession = { ...currentViewingSession };
+            document.getElementById('editStudyBtn').style.display = 'none';
+            document.getElementById('saveStudyBtn').style.display = 'inline-block';
+
+            // Make activities table editable
+            const tbody = document.querySelector('#detailActivitiesTable tbody');
+            const rows = tbody.querySelectorAll('tr');
+            rows.forEach((row, idx) => {
+                const typeCell = row.cells[6];
+                const currentType = typeCell.textContent.trim();
+                typeCell.innerHTML = `
+                    <select onchange="updateActivityType(${idx}, this.value)" style="padding: 4px; font-size: 12px;">
+                        <option value="Internal" ${currentType === 'Internal' ? 'selected' : ''}>Internal</option>
+                        <option value="External" ${currentType === 'External' ? 'selected' : ''}>External</option>
+                        <option value="Waste" ${currentType === 'Waste' ? 'selected' : ''}>Waste</option>
+                        <option value="Delay" ${currentType === 'Delay' ? 'selected' : ''}>Delay</option>
+                    </select>
+                `;
+            });
+
+            showToast('✏️ Edit mode enabled - modify classifications and save');
+        }
+
+        function updateActivityType(activityIndex, newType) {
+            // This will be used to track changes - store in editingSession
+            if (!editingSession) editingSession = { ...currentViewingSession };
+        }
+
+        async function saveEditedSession() {
+            if (!currentViewingSession) return;
+
+            const tbody = document.querySelector('#detailActivitiesTable tbody');
+            const rows = tbody.querySelectorAll('tr');
+            const newActivities = [];
+
+            // Get current session data from Firestore
+            const sessions = await getFirestoreCollection('sessions') || [];
+            const session = sessions.find(s =>
+                s.date === currentViewingSession.date &&
+                s.itemMasterNo === currentViewingSession.itemMasterNo &&
+                s.operator === currentViewingSession.operator
+            );
+
+            if (!session) return;
+
+            // Update activity classifications from the edited table
+            session.activities.forEach((activity, idx) => {
+                if (rows[idx]) {
+                    const selectEl = rows[idx].querySelector('select');
+                    if (selectEl) {
+                        activity.classification = selectEl.value;
+                    }
+                }
+            });
+
+            // Recalculate totals
+            let internalST = 0, externalTotal = 0, wasteTotal = 0;
+            session.activities.forEach(activity => {
+                const nt = (activity.diff * session.sessionRating / 100);
+                const st = nt * (1 + session.sessionAllowance / 100);
+                if (activity.classification === 'Internal') internalST += st;
+                else if (activity.classification === 'External') externalTotal += st;
+                else if (activity.classification === 'Waste') wasteTotal += st;
+            });
+
+            session.internalST = internalST;
+            session.externalTotal = externalTotal;
+            session.wasteTotal = wasteTotal;
+
+            // Save to Firestore
+            const sessionId = `${session.date}_${session.itemMasterNo}_${session.operator}`;
+            await saveToFirestore('sessions', sessionId, session);
+
+            // Exit edit mode
+            document.getElementById('editStudyBtn').style.display = 'inline-block';
+            document.getElementById('saveStudyBtn').style.display = 'none';
+
+            showToast('💾 Study saved successfully', 'success');
+
+            // Refresh the display
+            await viewSessionDetailsFromAnalytics(currentViewingSession.date, currentViewingSession.itemMasterNo, currentViewingSession.operator);
+            await updateAnalytics();
         }
 
         function deleteCurrentSession() {
