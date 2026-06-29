@@ -2592,22 +2592,16 @@
             showConfirm(
                 '🗑️ Delete Time Study?',
                 `Are you sure you want to delete this study?\n\nDate: ${currentViewingSession.date}\nItem Master No: ${currentViewingSession.itemMasterNo}\nOperator: ${currentViewingSession.operator}\n\nThis cannot be undone.`,
-                function() {
-                    const sessions = JSON.parse(localStorage.getItem('timeSessions')) || [];
-                    const filteredSessions = sessions.filter(s =>
-                        !(s.date === currentViewingSession.date &&
-                          s.itemMasterNo === currentViewingSession.itemMasterNo &&
-                          s.operator === currentViewingSession.operator)
-                    );
-
-                    localStorage.setItem('timeSessions', JSON.stringify(filteredSessions));
+                async function() {
+                    const sessionId = `${currentViewingSession.date}_${currentViewingSession.itemMasterNo}_${currentViewingSession.operator}`;
+                    await deleteFromFirestore('sessions', sessionId);
                     currentViewingSession = null;
 
                     showToast('🗑️ Study deleted successfully', 'success');
 
                     // Go back to analytics and refresh
-                    switchScreen('analyticsScreen');
-                    updateAnalytics();
+                    await switchScreen('analyticsScreen');
+                    await updateAnalytics();
                 }
             );
         }
