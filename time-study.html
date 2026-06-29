@@ -630,9 +630,9 @@
         }
 
         @media (max-width: 600px) {
-            /* Hide original button bar on mobile and show menu button instead */
-            [style*="position: fixed; bottom: 0"] {
-                display: none;
+            /* Hide original floating buttons on mobile and show menu button instead */
+            #floatingButtonsContainer {
+                display: none !important;
             }
         }
 
@@ -1398,7 +1398,7 @@
     <div id="toastContainer" style="position: fixed; top: 20px; right: 20px; z-index: 2000;"></div>
 
     <!-- Floating Action Buttons Container -->
-    <div style="position: fixed; bottom: 30px; right: 30px; z-index: 1000; display: flex; flex-direction: column; gap: 10px; align-items: flex-end;">
+    <div id="floatingButtonsContainer" style="position: fixed; bottom: 30px; right: 30px; z-index: 1000; display: flex; flex-direction: column; gap: 10px; align-items: flex-end;">
         <!-- Back to Home button -->
         <button id="floatingBackBtn" onclick="switchScreen('homeScreen')" style="
             padding: 15px 20px;
