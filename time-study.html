@@ -1573,7 +1573,8 @@
             let totalDiff = 0, delayDiff = 0;
             state.activities.forEach(activity => {
                 totalDiff += activity.diff;
-                if (activity.classification === 'Delay') {
+                const classification = activity.classification || 'Internal'; // Treat null/undefined as Internal
+                if (classification === 'Delay') {
                     delayDiff += activity.diff;
                 }
             });
@@ -1582,16 +1583,17 @@
 
             let internalNT = 0, internalST = 0, externalNT = 0, externalST = 0, wasteNT = 0, wasteST = 0;
             state.activities.forEach(activity => {
-                if (activity.classification === 'Delay') return; // Skip delay activities
+                const classification = activity.classification || 'Internal'; // Treat null/undefined as Internal
+                if (classification === 'Delay') return; // Skip delay activities
                 const nt = parseFloat((activity.diff * state.sessionRating / 100).toFixed(2));
                 const st = parseFloat((nt * (1 + state.sessionAllowance / 100)).toFixed(2));
-                if (activity.classification === 'Internal') {
+                if (classification === 'Internal') {
                     internalNT += nt;
                     internalST += st;
-                } else if (activity.classification === 'External') {
+                } else if (classification === 'External') {
                     externalNT += nt;
                     externalST += st;
-                } else if (activity.classification === 'Waste') {
+                } else if (classification === 'Waste') {
                     wasteNT += nt;
                     wasteST += st;
                 }
