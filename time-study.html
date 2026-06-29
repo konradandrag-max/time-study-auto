@@ -776,17 +776,16 @@
             overflow: hidden;
             background-color: #f5f5f5;
             border-top: 1px solid #e0e0e0;
-            z-index: 999;
+            z-index: 1000;
             transition: max-height 0.3s ease;
             display: flex;
             flex-direction: column;
             gap: 6px;
             padding: 10px;
-            padding-bottom: 55px;
         }
 
         #mobileMenuPanel.active {
-            max-height: 90vh;
+            max-height: calc(100vh - 50px);
             overflow-y: auto;
         }
 
