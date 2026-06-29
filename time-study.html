@@ -1362,6 +1362,7 @@
                 <button class="back-button" onclick="switchScreen('homeScreen')">← Back</button>
                 <button id="editStudyBtn" onclick="enableEditMode()" style="background-color: #ffc107; flex: 1; color: black;">✏️ Edit</button>
                 <button id="saveStudyBtn" onclick="saveEditedSession()" style="background-color: #28a745; flex: 1; display: none;">💾 Save</button>
+                <button onclick="exportCurrentStudy()" style="background-color: #17a2b8; flex: 1;">📥 Export</button>
                 <button onclick="deleteCurrentSession()" style="background-color: #dc3545; flex: 1;">🗑️ Delete</button>
             </div>
         </div>
@@ -3322,6 +3323,78 @@
             document.body.removeChild(link);
             const dateRange = (filterDateFrom || filterDateTo) ? ` (${filterDateFrom || 'start'} to ${filterDateTo || 'end'})` : '';
             showToast(`💾 Data exported as JSON${dateRange}`);
+        }
+
+        function exportCurrentStudy() {
+            if (!currentViewingSession) {
+                showToast('No study loaded', 'error');
+                return;
+            }
+
+            try {
+                // Get the current session data
+                const ratingEl = document.getElementById('detailRating');
+                const allowanceEl = document.getElementById('detailAllowance');
+                const ratingText = ratingEl ? ratingEl.textContent.replace('%', '').trim() : '100';
+                const allowanceText = allowanceEl ? allowanceEl.textContent.replace('%', '').trim() : '0';
+
+                // Build study object
+                const study = {
+                    date: currentViewingSession.date,
+                    itemMasterNo: currentViewingSession.itemMasterNo,
+                    operator: currentViewingSession.operator,
+                    sessionRating: parseInt(ratingText) || 100,
+                    sessionAllowance: parseInt(allowanceText) || 0,
+                    activities: [],
+                    internalST: 0,
+                    externalTotal: 0,
+                    wasteTotal: 0
+                };
+
+                // Get activities from table
+                const tbody = document.querySelector('#detailActivitiesTable tbody');
+                if (tbody) {
+                    const rows = tbody.querySelectorAll('tr');
+                    rows.forEach((row, idx) => {
+                        const activity = {
+                            no: row.cells[0].textContent,
+                            description: row.cells[1].textContent.trim(),
+                            ot: parseFloat(row.cells[2].textContent),
+                            diff: parseFloat(row.cells[3].textContent),
+                            classification: row.cells[6].textContent.trim()
+                        };
+                        study.activities.push(activity);
+                    });
+                }
+
+                // Calculate totals from displayed values
+                const stEl = document.getElementById('detailST');
+                const displayedST = stEl ? parseFloat(stEl.textContent) : 0;
+                study.internalST = displayedST; // Simplified - in real use this would be calculated
+
+                // Create export data
+                const exportData = {
+                    copyright: '© 2026 Konrad Andrag. All rights reserved.',
+                    sessions: [study],
+                    exportDate: new Date().toISOString()
+                };
+
+                // Export as JSON
+                const jsonString = JSON.stringify(exportData, null, 2);
+                const blob = new Blob([jsonString], { type: 'application/json;charset=utf-8;' });
+                const link = document.createElement('a');
+                link.setAttribute('href', URL.createObjectURL(blob));
+                link.setAttribute('download', `time_study_${study.date}_${study.itemMasterNo}_${study.operator}.json`);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+
+                showToast('📥 Study exported successfully', 'success');
+            } catch (error) {
+                console.error('Export error:', error);
+                showToast('Error exporting study', 'error');
+            }
         }
 
         async function handleImportFile(event) {
