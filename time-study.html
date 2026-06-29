@@ -1438,13 +1438,13 @@
                 db = firebase.firestore();
 
                 // Monitor auth state
-                auth.onAuthStateChanged(user => {
+                auth.onAuthStateChanged(async user => {
                     currentUser = user;
                     if (user) {
                         document.getElementById('authScreen').style.display = 'none';
                         document.getElementById('mainContainer').style.display = 'block';
-                        initDarkMode();
-                        updateAnalytics();
+                        await initDarkMode();
+                        await updateAnalytics();
                     } else {
                         document.getElementById('authScreen').style.display = 'flex';
                         document.getElementById('mainContainer').style.display = 'none';
@@ -1958,9 +1958,9 @@
             showToast('✅ Session saved successfully!', 'success');
 
             // Auto-refresh dashboard if we're on it
-            setTimeout(() => {
+            setTimeout(async () => {
                 if (document.querySelector('.screen.active').id === 'homeScreen') {
-                    loadDashboard();
+                    await loadDashboard();
                 }
             }, 500);
         }
@@ -2181,7 +2181,7 @@
             }
         }
 
-        function switchScreen(screenId) {
+        async function switchScreen(screenId) {
             document.querySelectorAll('.screen').forEach(screen => {
                 screen.classList.remove('active');
             });
@@ -2192,7 +2192,7 @@
             if (screenId === 'homeScreen') {
                 backBtn.style.display = 'none';
                 stopKeepAlive();
-                loadDashboard();
+                await loadDashboard();
                 if (state.recognition) state.recognition.abort();
                 state.shouldProcessSpeechResults = false;
             } else {
@@ -2351,8 +2351,8 @@
             switchScreen('sessionDetailsScreen');
         }
 
-        function loadDashboard() {
-            const sessions = JSON.parse(localStorage.getItem('timeSessions')) || [];
+        async function loadDashboard() {
+            const sessions = await getFirestoreCollection('sessions') || [];
             const now = new Date();
             const thirtyDaysAgo = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 30);
             const sevenDaysAgo = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7);
@@ -3048,7 +3048,7 @@
         }
 
         // Set today's date by default on page load
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
             initDarkMode();
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('date').value = today;
@@ -3081,7 +3081,7 @@
             });
 
             // Load dashboard (includes recent sessions display)
-            loadDashboard();
+            await loadDashboard();
         });
     </script>
 </body>
