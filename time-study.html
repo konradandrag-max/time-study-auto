@@ -785,6 +785,12 @@
         }
 
         @media (max-width: 480px) {
+            #micToggleBtn {
+                padding: 10px 14px !important;
+                font-size: 14px !important;
+                white-space: nowrap;
+            }
+
             #mobileMenuBtn {
                 width: 50px;
                 height: 50px;
@@ -1467,8 +1473,8 @@
                 ⚠️ Speech recognition is not supported in this browser. Manual entry only.
             </div>
             <div id="timerDisplay">0.00</div>
-            <div style="margin-bottom: 20px; text-align: center; display: flex; align-items: center; justify-content: center; gap: 15px;">
-                <span style="color: #28a745; font-weight: bold;" id="recordingStatus">🎤 Recording in progress...</span>
+            <div style="margin-bottom: 20px; text-align: center; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 12px;">
+                <span style="color: #28a745; font-weight: bold; flex-basis: 100%;" id="recordingStatus">🎤 Recording in progress...</span>
                 <button id="micToggleBtn" onclick="toggleMicrophone()" style="padding: 8px 12px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">🎙️ Mic ON</button>
             </div>
             <div class="activity-input-group" style="flex-direction: column;">
