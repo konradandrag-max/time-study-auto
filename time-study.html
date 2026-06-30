@@ -2007,7 +2007,7 @@
                 status.textContent = '⏸️ Microphone disabled (manual entry only)';
                 status.style.color = '#dc3545';
                 if (state.recognition) {
-                    state.recognition.stop();
+                    state.recognition.abort();
                 }
             }
         }
