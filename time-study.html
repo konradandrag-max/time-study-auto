@@ -2740,6 +2740,14 @@
                                 </select>
                             `;
                         }
+
+                        // Add setup checkbox
+                        const setupCell = row.cells[7];
+                        if (setupCell) {
+                            const currentSetup = row.cells[7].querySelector('input[type="checkbox"]');
+                            const isSetup = currentSetup ? currentSetup.checked : false;
+                            setupCell.innerHTML = `<input type="checkbox" id="activity_setup_${idx}" ${isSetup ? 'checked' : ''} style="cursor: pointer;">`;
+                        }
                     });
                 }
 
