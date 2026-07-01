@@ -1279,6 +1279,10 @@
                         <div style="font-size: 18px; font-weight: bold;" id="detailDate">-</div>
                     </div>
                     <div>
+                        <label style="color: #666; font-size: 12px;">Job Number</label>
+                        <div style="font-size: 18px; font-weight: bold;" id="detailJobNumber">-</div>
+                    </div>
+                    <div>
                         <label style="color: #666; font-size: 12px;">Performance Rating (%)</label>
                         <div style="font-size: 18px; font-weight: bold;" id="detailRating">-</div>
                     </div>
@@ -2621,6 +2625,7 @@
             document.getElementById('detailPart').textContent = session.itemMasterNo;
             document.getElementById('detailOperator').textContent = session.operator;
             document.getElementById('detailDate').textContent = session.date;
+            document.getElementById('detailJobNumber').textContent = session.jobNumber || '-';
             document.getElementById('detailRating').textContent = session.sessionRating + '%';
             document.getElementById('detailAllowance').textContent = (session.sessionAllowance || 0) + '%';
 
