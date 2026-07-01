@@ -3221,34 +3221,56 @@
 
                 console.log('Filtered daily averages for chart:', efficiencies);
 
-                if (window.efficiencyChart && typeof window.efficiencyChart.destroy === 'function') {
-                    window.efficiencyChart.destroy();
-                }
-
-                window.efficiencyChart = new Chart(chartCanvas, {
-                    type: 'line',
-                    data: {
-                        labels: efficiencies.map(e => e.date),
-                        datasets: [{
-                            label: 'Daily Average Efficiency %',
-                            data: efficiencies.map(e => e.efficiency),
-                            borderColor: '#667eea',
-                            backgroundColor: 'rgba(102, 126, 234, 0.1)',
-                            tension: 0.4,
-                            fill: true,
-                            pointRadius: 4
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: {
-                            legend: { display: true }
-                        },
-                        scales: {
-                            y: { beginAtZero: true, max: 100 }
-                        }
+                if (efficiencies.length === 0) {
+                    chartCanvas.style.display = 'none';
+                    const parent = chartCanvas.parentElement;
+                    if (parent && !parent.querySelector('.no-data-message')) {
+                        const msg = document.createElement('div');
+                        msg.className = 'no-data-message';
+                        msg.textContent = 'No data available for the selected filters';
+                        msg.style.padding = '20px';
+                        msg.style.textAlign = 'center';
+                        msg.style.color = '#666';
+                        parent.insertBefore(msg, chartCanvas);
                     }
-                });
+                } else {
+                    chartCanvas.style.display = 'block';
+                    const noDataMsg = chartCanvas.parentElement?.querySelector('.no-data-message');
+                    if (noDataMsg) noDataMsg.remove();
+
+                    if (window.efficiencyChart && typeof window.efficiencyChart.destroy === 'function') {
+                        window.efficiencyChart.destroy();
+                    }
+
+                    try {
+                        window.efficiencyChart = new Chart(chartCanvas, {
+                            type: 'line',
+                            data: {
+                                labels: efficiencies.map(e => e.date),
+                                datasets: [{
+                                    label: 'Daily Average Efficiency %',
+                                    data: efficiencies.map(e => e.efficiency),
+                                    borderColor: '#667eea',
+                                    backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                                    tension: 0.4,
+                                    fill: true,
+                                    pointRadius: 4
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                plugins: {
+                                    legend: { display: true }
+                                },
+                                scales: {
+                                    y: { beginAtZero: true, max: 100 }
+                                }
+                            }
+                        });
+                    } catch (error) {
+                        console.error('Error creating efficiency chart:', error);
+                    }
+                }
             }
 
 
