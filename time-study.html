@@ -1526,6 +1526,9 @@
                 </div>
             </div>
             <h2>Activity Details</h2>
+            <div style="margin-bottom: 15px; padding: 10px; background-color: #e3f2fd; border-radius: 4px; font-size: 13px; color: #333;">
+                💡 Click "Setup" checkbox to mark activities as setup (not part of cycle time)
+            </div>
             <div class="table-wrapper">
                 <table id="activitiesTable3">
                     <thead>
@@ -1538,6 +1541,7 @@
                             <th>NT</th>
                             <th>ST</th>
                             <th>Classification</th>
+                            <th>Setup</th>
                         </tr>
                     </thead>
                     <tbody></tbody>
@@ -1567,6 +1571,10 @@
                 <div class="summary-item">
                     <label>Final Std Time</label>
                     <div class="value" id="finalStdTime">0.00</div>
+                </div>
+                <div class="summary-item">
+                    <label>Cycle Time ST (without setup)</label>
+                    <div class="value" id="cycleTimeST">0.00</div>
                 </div>
                 <div class="summary-item">
                     <label>Overall Efficiency</label>
@@ -2285,6 +2293,7 @@
                             <button class="btn-delay ${activity.classification === 'Delay' ? 'active' : ''}" onclick="setClassification(${index}, 'Delay')" style="background-color: #9c27b0; font-size: 10px; padding: 4px 6px;">Dly</button>
                         </div>
                     </td>
+                    <td><input type="checkbox" ${activity.isSetup ? 'checked' : ''} onchange="toggleSetupActivity(${index}, this.checked)" style="cursor: pointer;"></td>
                 `;
             });
         }
@@ -2336,6 +2345,12 @@
             updateSummary();
         }
 
+        // Toggle setup activity status
+        function toggleSetupActivity(index, isSetup) {
+            state.activities[index].isSetup = isSetup;
+            updateSummary();
+        }
+
         // Update summary section
         function updateSummary() {
             // Calculate BT excluding delay activities
@@ -2370,11 +2385,23 @@
 
             const finalStdTime = internalST + externalST + wasteST;
 
+            // Calculate cycle time ST (excluding setup activities)
+            let cycleTimeST = 0;
+            state.activities.forEach(activity => {
+                if (activity.isSetup) return; // Skip setup activities
+                const classification = activity.classification || 'Internal';
+                if (classification === 'Delay') return;
+                const nt = parseFloat((activity.diff * state.sessionRating / 100).toFixed(2));
+                const st = parseFloat((nt * (1 + state.sessionAllowance / 100)).toFixed(2));
+                cycleTimeST += st;
+            });
+
             document.getElementById('internalTotal').textContent = internalNT.toFixed(2);
             document.getElementById('internalST').textContent = internalST.toFixed(2);
             document.getElementById('externalTotal').textContent = externalNT.toFixed(2);
             document.getElementById('wasteTotal').textContent = wasteNT.toFixed(2);
             document.getElementById('finalStdTime').textContent = finalStdTime.toFixed(2);
+            document.getElementById('cycleTimeST').textContent = cycleTimeST.toFixed(2);
 
             const efficiency = adjustedBT > 0 ? (internalNT / adjustedBT * 100) : 0;
             document.getElementById('efficiency').textContent = efficiency.toFixed(2) + '%';
