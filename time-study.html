@@ -1371,6 +1371,10 @@
                         <input type="text" id="filterItemMasterNo" placeholder="Filter by item master" onchange="updateAnalytics()">
                     </div>
                     <div class="form-field">
+                        <label>Job Number</label>
+                        <input type="text" id="filterJobNumber" placeholder="Filter by job number" onchange="updateAnalytics()">
+                    </div>
+                    <div class="form-field">
                         <label>Date From</label>
                         <input type="date" id="filterDateFrom" onchange="updateAnalytics()">
                     </div>
@@ -3147,6 +3151,7 @@
         async function updateAnalytics() {
             const filterOperator = document.getElementById('filterOperator')?.value.toLowerCase() || '';
             const filterItemMasterNo = document.getElementById('filterItemMasterNo')?.value.toLowerCase() || '';
+            const filterJobNumber = document.getElementById('filterJobNumber')?.value.toLowerCase() || '';
             const filterDateFrom = document.getElementById('filterDateFrom')?.value || '';
             const filterDateTo = document.getElementById('filterDateTo')?.value || '';
 
@@ -3155,6 +3160,7 @@
             let filtered = sessions.filter(session => {
                 if (filterOperator && !session.operator.toLowerCase().includes(filterOperator)) return false;
                 if (filterItemMasterNo && !((session.itemMasterNo || '').toLowerCase().includes(filterItemMasterNo))) return false;
+                if (filterJobNumber && !((session.jobNumber || '').toLowerCase().includes(filterJobNumber))) return false;
                 if (filterDateFrom && session.date < filterDateFrom) return false;
                 if (filterDateTo && session.date > filterDateTo) return false;
                 return true;
@@ -3252,12 +3258,14 @@
             // Apply the same filters as the analytics page
             const filterOperator = document.getElementById('filterOperator')?.value.toLowerCase() || '';
             const filterItemMasterNo = document.getElementById('filterItemMasterNo')?.value.toLowerCase() || '';
+            const filterJobNumber = document.getElementById('filterJobNumber')?.value.toLowerCase() || '';
             const filterDateFrom = document.getElementById('filterDateFrom')?.value || '';
             const filterDateTo = document.getElementById('filterDateTo')?.value || '';
 
             let filtered = sessions.filter(session => {
                 if (filterOperator && !session.operator.toLowerCase().includes(filterOperator)) return false;
                 if (filterItemMasterNo && !((session.itemMasterNo || '').toLowerCase().includes(filterItemMasterNo))) return false;
+                if (filterJobNumber && !((session.jobNumber || '').toLowerCase().includes(filterJobNumber))) return false;
                 if (filterDateFrom && session.date < filterDateFrom) return false;
                 if (filterDateTo && session.date > filterDateTo) return false;
                 return true;
@@ -3301,6 +3309,7 @@
         async function clearFilters() {
             document.getElementById('filterOperator').value = '';
             document.getElementById('filterItemMasterNo').value = '';
+            document.getElementById('filterJobNumber').value = '';
             document.getElementById('filterDateFrom').value = '';
             document.getElementById('filterDateTo').value = '';
             await updateAnalytics();
@@ -3691,12 +3700,14 @@
             // Apply the same filters as the analytics page
             const filterOperator = document.getElementById('filterOperator')?.value.toLowerCase() || '';
             const filterItemMasterNo = document.getElementById('filterItemMasterNo')?.value.toLowerCase() || '';
+            const filterJobNumber = document.getElementById('filterJobNumber')?.value.toLowerCase() || '';
             const filterDateFrom = document.getElementById('filterDateFrom')?.value || '';
             const filterDateTo = document.getElementById('filterDateTo')?.value || '';
 
             let sessions = allSessions.filter(session => {
                 if (filterOperator && !session.operator.toLowerCase().includes(filterOperator)) return false;
                 if (filterItemMasterNo && !((session.itemMasterNo || '').toLowerCase().includes(filterItemMasterNo))) return false;
+                if (filterJobNumber && !((session.jobNumber || '').toLowerCase().includes(filterJobNumber))) return false;
                 if (filterDateFrom && session.date < filterDateFrom) return false;
                 if (filterDateTo && session.date > filterDateTo) return false;
                 return true;
