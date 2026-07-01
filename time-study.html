@@ -2973,8 +2973,10 @@
                 const external = arr.reduce((sum, s) => sum + (s.externalTotal || 0), 0);
                 const waste = arr.reduce((sum, s) => sum + (s.wasteTotal || 0), 0);
                 const total = internal + external + waste;
-                const eff = total === 0 ? 0 : ((internal / total) * 100).toFixed(1);
-                console.log('calcEfficiency:', { arrLength: arr.length, internal, external, waste, total, efficiency: eff });
+                const totalRating = arr.reduce((sum, s) => sum + (s.sessionRating || 100), 0);
+                const avgRating = arr.length > 0 ? totalRating / arr.length : 100;
+                const eff = total === 0 ? 0 : ((internal / total) * 100 * (avgRating / 100)).toFixed(1);
+                console.log('calcEfficiency:', { arrLength: arr.length, internal, external, waste, total, avgRating, efficiency: eff });
                 return eff;
             };
 
@@ -3072,6 +3074,11 @@
                 const daySessions = sessions.filter(s => s.date === dateStr);
                 const dayEff = calcEfficiency(daySessions);
                 last30Days.push({ date: dateStr.split('-')[2], dateStr, efficiency: dayEff, count: daySessions.length });
+            }
+
+            // Add error handling to chart rendering
+            if (last30Days.length === 0) {
+                console.warn('No data available for efficiency chart');
             }
 
             // Monthly trend chart
