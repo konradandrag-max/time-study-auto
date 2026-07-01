@@ -1345,7 +1345,8 @@
                 <button class="back-button" onclick="switchScreen('homeScreen')">← Back</button>
                 <button id="editStudyBtn" onclick="enableEditMode()" style="background-color: #ffc107; flex: 1; color: black;">✏️ Edit</button>
                 <button id="saveStudyBtn" onclick="saveEditedSession()" style="background-color: #28a745; flex: 1; display: none;">💾 Save</button>
-                <button onclick="exportCurrentStudy()" style="background-color: #17a2b8; flex: 1; display: block !important; visibility: visible !important;">📥 Export</button>
+                <button onclick="exportCurrentStudyCSV()" style="background-color: #6c757d; flex: 1;">📊 CSV</button>
+                <button onclick="exportCurrentStudy()" style="background-color: #17a2b8; flex: 1; display: block !important; visibility: visible !important;">📥 JSON</button>
                 <button onclick="deleteCurrentSession()" style="background-color: #dc3545; flex: 1;">🗑️ Delete</button>
             </div>
         </div>
@@ -3444,6 +3445,60 @@
             } catch (error) {
                 console.error('Export error:', error);
                 showToast('Error exporting study', 'error');
+            }
+        }
+
+        function exportCurrentStudyCSV() {
+            if (!currentViewingSession) {
+                showToast('No study loaded', 'error');
+                return;
+            }
+
+            try {
+                const ratingEl = document.getElementById('detailRating');
+                const allowanceEl = document.getElementById('detailAllowance');
+                const ratingText = ratingEl ? ratingEl.textContent.replace('%', '').trim() : '100';
+                const allowanceText = allowanceEl ? allowanceEl.textContent.replace('%', '').trim() : '0';
+
+                let csv = '© 2026 Konrad Andrag. All rights reserved.\n';
+                csv += 'DIGITAL TIME STUDY REPORT\n\n';
+                csv += `Date,${currentViewingSession.date}\n`;
+                csv += `Item Master No,${currentViewingSession.itemMasterNo}\n`;
+                csv += `Job Number,${currentViewingSession.jobNumber || ''}\n`;
+                csv += `Operator,${currentViewingSession.operator}\n`;
+                csv += `Performance Rating,${ratingText}%\n`;
+                csv += `Allowance,${allowanceText}%\n\n`;
+
+                csv += 'No,Description,OT,DIFF,NT,ST,Classification\n';
+                const tbody = document.querySelector('#detailActivitiesTable tbody');
+                if (tbody) {
+                    const rows = tbody.querySelectorAll('tr');
+                    rows.forEach((row) => {
+                        const no = row.cells[0].textContent;
+                        const desc = row.cells[1].textContent.trim();
+                        const ot = row.cells[2].textContent;
+                        const diff = row.cells[3].textContent;
+                        const nt = row.cells[4].textContent;
+                        const st = row.cells[5].textContent;
+                        const classification = row.cells[6].textContent.trim();
+                        csv += `${no},"${desc}",${ot},${diff},${nt},${st},${classification}\n`;
+                    });
+                }
+
+                // Create CSV blob and download
+                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                link.setAttribute('href', URL.createObjectURL(blob));
+                link.setAttribute('download', `time_study_${currentViewingSession.date}_${currentViewingSession.itemMasterNo}_${currentViewingSession.operator}.csv`);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+
+                showToast('📊 CSV exported successfully', 'success');
+            } catch (error) {
+                console.error('CSV export error:', error);
+                showToast('Error exporting CSV', 'error');
             }
         }
 
