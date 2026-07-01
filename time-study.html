@@ -2642,7 +2642,7 @@
                         <td>${nt}</td>
                         <td>${st}</td>
                         <td><span style="background: ${typeColor}; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px;">${activity.classification || 'Unclassified'}</span></td>
-                        <td><input type="checkbox" ${activity.isSetup ? 'checked' : ''} onchange="toggleDetailActivitySetup(${index}, this.checked)" style="cursor: pointer;"></td>
+                        <td style="text-align: center;"><input type="checkbox" id="setup_${index}" ${activity.isSetup ? 'checked' : ''} style="cursor: pointer; width: 18px; height: 18px;"></td>
                     </tr>
                 `;
             }).join('');
@@ -2741,12 +2741,15 @@
                             `;
                         }
 
-                        // Add setup checkbox
+                        // Ensure setup checkbox is interactive
                         const setupCell = row.cells[7];
                         if (setupCell) {
-                            const currentSetup = row.cells[7].querySelector('input[type="checkbox"]');
-                            const isSetup = currentSetup ? currentSetup.checked : false;
-                            setupCell.innerHTML = `<input type="checkbox" id="activity_setup_${idx}" ${isSetup ? 'checked' : ''} style="cursor: pointer;">`;
+                            const setupCheckbox = setupCell.querySelector('input[type="checkbox"]');
+                            if (setupCheckbox) {
+                                setupCheckbox.style.width = '18px';
+                                setupCheckbox.style.height = '18px';
+                                setupCheckbox.style.cursor = 'pointer';
+                            }
                         }
                     });
                 }
