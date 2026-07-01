@@ -3380,12 +3380,13 @@
                 });
             }
 
-            const csv = ['© 2026 Konrad Andrag. All rights reserved.', '', 'Date,Item Master No,Operator,Activities,Efficiency,Internal ST,External ST,Waste ST,Final Std Time'];
+            const csv = [];
+            csv.push('Date,Item Master No,Operator,Job Number,Activities,Efficiency,Internal ST,External ST,Waste ST,Final Std Time');
             sessions.forEach(s => {
                 const total = (s.internalST || 0) + (s.externalTotal || 0) + (s.wasteTotal || 0);
                 const rating = (s.sessionRating || 100) / 100;
                 const efficiency = total === 0 ? 0 : ((s.internalST || 0) / total * 100 * rating).toFixed(1);
-                csv.push(`"${s.date}","${s.itemMasterNo}","${s.operator}",${s.activities?.length || 0},${efficiency},"${(s.internalST || 0).toFixed(2)}","${(s.externalTotal || 0).toFixed(2)}","${(s.wasteTotal || 0).toFixed(2)}","${total.toFixed(2)}"`);
+                csv.push(`${s.date},${s.itemMasterNo},${s.operator},${s.jobNumber || ''},${s.activities?.length || 0},${efficiency},${(s.internalST || 0).toFixed(2)},${(s.externalTotal || 0).toFixed(2)},${(s.wasteTotal || 0).toFixed(2)},${total.toFixed(2)}`);
             });
 
             const blob = new Blob([csv.join('\n')], { type: 'text/csv' });
@@ -3422,12 +3423,13 @@
                 return;
             }
 
-            const csv = ['© 2026 Konrad Andrag. All rights reserved.', '', 'Date,Item Master No,Operator,Activities,Efficiency,Internal ST,External ST,Waste ST,Final Std Time'];
+            const csv = [];
+            csv.push('Date,Item Master No,Operator,Job Number,Activities,Efficiency,Internal ST,External ST,Waste ST,Final Std Time');
             starredSessions.forEach(s => {
                 const total = (s.internalST || 0) + (s.externalTotal || 0) + (s.wasteTotal || 0);
                 const rating = (s.sessionRating || 100) / 100;
                 const efficiency = total === 0 ? 0 : ((s.internalST || 0) / total * 100 * rating).toFixed(1);
-                csv.push(`"${s.date}","${s.itemMasterNo}","${s.operator}",${s.activities?.length || 0},${efficiency},"${(s.internalST || 0).toFixed(2)}","${(s.externalTotal || 0).toFixed(2)}","${(s.wasteTotal || 0).toFixed(2)}","${total.toFixed(2)}"`);
+                csv.push(`${s.date},${s.itemMasterNo},${s.operator},${s.jobNumber || ''},${s.activities?.length || 0},${efficiency},${(s.internalST || 0).toFixed(2)},${(s.externalTotal || 0).toFixed(2)},${(s.wasteTotal || 0).toFixed(2)},${total.toFixed(2)}`);
             });
 
             const blob = new Blob([csv.join('\n')], { type: 'text/csv' });
