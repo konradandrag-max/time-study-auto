@@ -1297,6 +1297,22 @@
                 <h3 style="margin-bottom: 15px;">Edit Session Details</h3>
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px;">
                     <div>
+                        <label style="color: #333; font-size: 12px;">Date</label>
+                        <input type="date" id="editDetailDate" style="width: 100%; padding: 8px; border: 2px solid #90caf9; border-radius: 4px;">
+                    </div>
+                    <div>
+                        <label style="color: #333; font-size: 12px;">Item Master No</label>
+                        <input type="text" id="editDetailPart" style="width: 100%; padding: 8px; border: 2px solid #90caf9; border-radius: 4px;">
+                    </div>
+                    <div>
+                        <label style="color: #333; font-size: 12px;">Job Number</label>
+                        <input type="text" id="editDetailJobNumber" style="width: 100%; padding: 8px; border: 2px solid #90caf9; border-radius: 4px;">
+                    </div>
+                    <div>
+                        <label style="color: #333; font-size: 12px;">Operator</label>
+                        <input type="text" id="editDetailOperator" style="width: 100%; padding: 8px; border: 2px solid #90caf9; border-radius: 4px;">
+                    </div>
+                    <div>
                         <label style="color: #333; font-size: 12px;">Performance Rating (%)</label>
                         <input type="number" id="editDetailRating" style="width: 100%; padding: 8px; border: 2px solid #90caf9; border-radius: 4px;" min="0" max="200">
                     </div>
@@ -1513,6 +1529,25 @@
         <!-- Screen 3: Review & Export -->
         <div class="screen" id="screen3">
             <h1>Review & Export</h1>
+            <h2 style="font-size: 16px; margin-bottom: 15px;">Session Information</h2>
+            <div style="background-color: #fff3cd; padding: 15px; border-radius: 4px; margin-bottom: 20px; border: 1px solid #ffc107; display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div>
+                    <label style="font-weight: bold; display: block; margin-bottom: 8px; font-size: 13px;">Date:</label>
+                    <input type="date" id="reviewDate" style="width: 100%; padding: 8px; border: 2px solid #ccc; border-radius: 4px;" onchange="updateSessionDate(this.value)">
+                </div>
+                <div>
+                    <label style="font-weight: bold; display: block; margin-bottom: 8px; font-size: 13px;">Item Master No:</label>
+                    <input type="text" id="reviewItemMasterNo" style="width: 100%; padding: 8px; border: 2px solid #ccc; border-radius: 4px;" onchange="updateSessionItemMasterNo(this.value)">
+                </div>
+                <div>
+                    <label style="font-weight: bold; display: block; margin-bottom: 8px; font-size: 13px;">Job Number:</label>
+                    <input type="text" id="reviewJobNumber" style="width: 100%; padding: 8px; border: 2px solid #ccc; border-radius: 4px;" onchange="updateSessionJobNumber(this.value)">
+                </div>
+                <div>
+                    <label style="font-weight: bold; display: block; margin-bottom: 8px; font-size: 13px;">Operator:</label>
+                    <input type="text" id="reviewOperator" style="width: 100%; padding: 8px; border: 2px solid #ccc; border-radius: 4px;" onchange="updateSessionOperator(this.value)">
+                </div>
+            </div>
             <div style="background-color: #f9f9f9; padding: 20px; border-radius: 4px; margin-bottom: 20px; border: 2px solid #e0e0e0; display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                 <div>
                     <label style="font-weight: bold; display: block; margin-bottom: 10px;">Performance Rating (%) - Applied to entire cycle:</label>
@@ -2228,8 +2263,29 @@
             switchScreen('screen3');
             document.getElementById('sessionRating').value = state.sessionRating;
             document.getElementById('sessionAllowance').value = state.sessionAllowance;
+            document.getElementById('reviewDate').value = state.session.date;
+            document.getElementById('reviewItemMasterNo').value = state.session.itemMasterNo;
+            document.getElementById('reviewJobNumber').value = state.session.jobNumber;
+            document.getElementById('reviewOperator').value = state.session.operator;
             updateActivitiesTable3();
             updateSummary();
+        }
+
+        // Update session fields
+        function updateSessionDate(value) {
+            state.session.date = value;
+        }
+
+        function updateSessionItemMasterNo(value) {
+            state.session.itemMasterNo = value.trim();
+        }
+
+        function updateSessionJobNumber(value) {
+            state.session.jobNumber = value.trim();
+        }
+
+        function updateSessionOperator(value) {
+            state.session.operator = value.trim();
         }
 
         async function saveSession() {
@@ -2637,8 +2693,17 @@
                 const ratingText = ratingEl ? ratingEl.textContent.replace('%', '').trim() : '100';
                 const allowanceText = allowanceEl ? allowanceEl.textContent.replace('%', '').trim() : '0';
 
+                const editDateEl = document.getElementById('editDetailDate');
+                const editPartEl = document.getElementById('editDetailPart');
+                const editJobNumberEl = document.getElementById('editDetailJobNumber');
+                const editOperatorEl = document.getElementById('editDetailOperator');
                 const editRatingEl = document.getElementById('editDetailRating');
                 const editAllowanceEl = document.getElementById('editDetailAllowance');
+
+                if (editDateEl) editDateEl.value = currentViewingSession.date || '';
+                if (editPartEl) editPartEl.value = currentViewingSession.itemMasterNo || '';
+                if (editJobNumberEl) editJobNumberEl.value = currentViewingSession.jobNumber || '';
+                if (editOperatorEl) editOperatorEl.value = currentViewingSession.operator || '';
                 if (editRatingEl) editRatingEl.value = ratingText || 100;
                 if (editAllowanceEl) editAllowanceEl.value = allowanceText || 0;
 
@@ -2686,6 +2751,10 @@
             if (!currentViewingSession) return;
 
             // Get edited values
+            const newDate = document.getElementById('editDetailDate').value;
+            const newItemMasterNo = document.getElementById('editDetailPart').value.trim();
+            const newJobNumber = document.getElementById('editDetailJobNumber').value.trim();
+            const newOperator = document.getElementById('editDetailOperator').value.trim();
             const newRating = parseInt(document.getElementById('editDetailRating').value) || 100;
             const newAllowance = parseInt(document.getElementById('editDetailAllowance').value) || 0;
             const tbody = document.querySelector('#detailActivitiesTable tbody');
@@ -2700,6 +2769,12 @@
             );
 
             if (!session) return;
+
+            // Update session details
+            session.date = newDate;
+            session.itemMasterNo = newItemMasterNo;
+            session.jobNumber = newJobNumber;
+            session.operator = newOperator;
 
             // Update session rating and allowance
             session.sessionRating = newRating;
@@ -2730,9 +2805,24 @@
             session.externalTotal = externalTotal;
             session.wasteTotal = wasteTotal;
 
-            // Save to Firestore
-            const sessionId = `${session.date}_${session.itemMasterNo}_${session.operator}`;
-            await saveToFirestore('sessions', sessionId, session);
+            // Save to Firestore with new session ID
+            const oldSessionId = `${currentViewingSession.date}_${currentViewingSession.itemMasterNo}_${currentViewingSession.operator}`;
+            const newSessionId = `${session.date}_${session.itemMasterNo}_${session.operator}`;
+
+            await saveToFirestore('sessions', newSessionId, session);
+
+            // If session ID changed, delete old session
+            if (oldSessionId !== newSessionId) {
+                await deleteFromFirestore('sessions', oldSessionId);
+            }
+
+            // Update currentViewingSession with new values
+            currentViewingSession = {
+                date: newDate,
+                itemMasterNo: newItemMasterNo,
+                jobNumber: newJobNumber,
+                operator: newOperator
+            };
 
             // Exit edit mode
             document.getElementById('editStudyBtn').style.display = 'inline-block';
