@@ -1460,6 +1460,10 @@
                     <label for="operator">Operator *</label>
                     <input type="text" id="operator" placeholder="e.g., John Smith">
                 </div>
+                <div class="form-field">
+                    <label for="jobNumber">Job Number *</label>
+                    <input type="text" id="jobNumber" placeholder="e.g., JOB-12345">
+                </div>
             </div>
             <div class="button-group">
                 <button onclick="startStudy()" style="flex: 1; min-width: 200px; padding: 20px 40px; font-size: 18px;">Start Study</button>
@@ -2037,8 +2041,9 @@
             const date = document.getElementById('date').value;
             const itemMasterNo = document.getElementById('itemMasterNo').value.trim();
             const operator = document.getElementById('operator').value.trim();
+            const jobNumber = document.getElementById('jobNumber').value.trim();
 
-            if (!date || !itemMasterNo || !operator) {
+            if (!date || !itemMasterNo || !operator || !jobNumber) {
                 alert('Please fill in all required fields');
                 return;
             }
@@ -2046,7 +2051,8 @@
             state.session = {
                 date,
                 itemMasterNo,
-                operator
+                operator,
+                jobNumber
             };
 
             state.activities = [];
@@ -2413,6 +2419,7 @@
             csv += 'DIGITAL TIME STUDY REPORT\n\n';
             csv += `Date,${state.session.date}\n`;
             csv += `Item Master No,${state.session.itemMasterNo}\n`;
+            csv += `Job Number,${state.session.jobNumber}\n`;
             csv += `Operator,${state.session.operator}\n\n`;
 
             csv += 'No,Description,OT,DIFF,NT,ST,Classification\n';
