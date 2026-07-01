@@ -3506,14 +3506,34 @@
 
                 // Calculate cycle time (exclude setup activities) from actual activity data
                 let cycleTime = 0;
-                if (currentViewingActivities) {
-                    currentViewingActivities.forEach(activity => {
-                        const nt = (activity.diff * parseInt(ratingText) / 100);
-                        const st = nt * (1 + parseInt(allowanceText) / 100);
-                        if (!activity.isSetup) {
-                            cycleTime += st;
+                try {
+                    const rating = parseInt(ratingText) || 100;
+                    const allowance = parseInt(allowanceText) || 0;
+
+                    if (currentViewingActivities && currentViewingActivities.length > 0) {
+                        currentViewingActivities.forEach(activity => {
+                            if (activity && activity.diff !== undefined) {
+                                const nt = (activity.diff * rating / 100);
+                                const st = nt * (1 + allowance / 100);
+                                if (!activity.isSetup) {
+                                    cycleTime += st;
+                                }
+                            }
+                        });
+                    } else {
+                        // Fallback: calculate from table if activities data not available
+                        const tbody = document.querySelector('#detailActivitiesTable tbody');
+                        if (tbody) {
+                            const rows = tbody.querySelectorAll('tr');
+                            rows.forEach((row) => {
+                                const st = parseFloat(row.cells[5].textContent) || 0;
+                                cycleTime += st;
+                            });
                         }
-                    });
+                    }
+                } catch (error) {
+                    console.error('Error calculating cycle time:', error);
+                    cycleTime = 0;
                 }
                 csv += `Cycle Time (without setup),${cycleTime.toFixed(2)}\n\n`;
 
