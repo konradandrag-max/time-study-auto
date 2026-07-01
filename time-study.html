@@ -2779,6 +2779,12 @@
             const newOperator = document.getElementById('editDetailOperator').value.trim();
             const newRating = parseInt(document.getElementById('editDetailRating').value) || 100;
             const newAllowance = parseInt(document.getElementById('editDetailAllowance').value) || 0;
+
+            // Validate required fields
+            if (!newDate || !newItemMasterNo || !newOperator) {
+                showToast('Please fill in all required fields', 'error');
+                return;
+            }
             const tbody = document.querySelector('#detailActivitiesTable tbody');
             const rows = tbody.querySelectorAll('tr');
 
@@ -2897,19 +2903,21 @@
             if (!session) return;
 
             // Set current viewing session for delete functionality
-            currentViewingSession = { date: session.date, itemMasterNo: session.itemMasterNo, operator: session.operator };
+            currentViewingSession = { date: session.date, itemMasterNo: session.itemMasterNo, operator: session.operator, jobNumber: session.jobNumber };
+            currentViewingActivities = session.activities;
 
             // Populate header
             document.getElementById('detailPart').textContent = session.itemMasterNo;
             document.getElementById('detailOperator').textContent = session.operator;
             document.getElementById('detailDate').textContent = session.date;
+            document.getElementById('detailJobNumber').textContent = session.jobNumber || '-';
             document.getElementById('detailRating').textContent = session.sessionRating + '%';
             document.getElementById('detailAllowance').textContent = (session.sessionAllowance || 0) + '%';
 
             const totalST = (session.internalST || 0) + (session.externalTotal || 0) + (session.wasteTotal || 0);
             document.getElementById('detailST').textContent = totalST.toFixed(2);
 
-            // Populate activities table
+            // Populate activities table (setup checkboxes only in edit mode)
             const tbody = document.querySelector('#detailActivitiesTable tbody');
             tbody.innerHTML = (session.activities || []).map(activity => {
                 const nt = (activity.diff * session.sessionRating / 100).toFixed(2);
@@ -2924,6 +2932,7 @@
                         <td>${nt}</td>
                         <td>${st}</td>
                         <td><span style="background: ${typeColor}; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px;">${activity.classification || 'Unclassified'}</span></td>
+                        <td></td>
                     </tr>
                 `;
             }).join('');
