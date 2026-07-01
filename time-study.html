@@ -3506,6 +3506,8 @@
 
                 // Calculate cycle time (exclude setup activities) from actual activity data
                 let cycleTime = 0;
+                const tbody = document.querySelector('#detailActivitiesTable tbody');
+
                 try {
                     const rating = parseInt(ratingText) || 100;
                     const allowance = parseInt(allowanceText) || 0;
@@ -3520,16 +3522,13 @@
                                 }
                             }
                         });
-                    } else {
+                    } else if (tbody) {
                         // Fallback: calculate from table if activities data not available
-                        const tbody = document.querySelector('#detailActivitiesTable tbody');
-                        if (tbody) {
-                            const rows = tbody.querySelectorAll('tr');
-                            rows.forEach((row) => {
-                                const st = parseFloat(row.cells[5].textContent) || 0;
-                                cycleTime += st;
-                            });
-                        }
+                        const rows = tbody.querySelectorAll('tr');
+                        rows.forEach((row) => {
+                            const st = parseFloat(row.cells[5].textContent) || 0;
+                            cycleTime += st;
+                        });
                     }
                 } catch (error) {
                     console.error('Error calculating cycle time:', error);
