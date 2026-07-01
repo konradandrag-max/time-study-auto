@@ -2481,7 +2481,10 @@
             document.getElementById('finalStdTime').textContent = finalStdTime.toFixed(2);
             document.getElementById('cycleTimeST').textContent = cycleTimeST.toFixed(2);
 
-            const efficiency = adjustedBT > 0 ? (internalNT / adjustedBT * 100) : 0;
+            // Efficiency = (Internal ST / Total ST) × Performance Rating
+            const totalST = internalST + externalST + wasteST;
+            const rating = state.sessionRating || 100;
+            const efficiency = totalST > 0 ? ((internalST / totalST) * 100 * (rating / 100)) : 0;
             document.getElementById('efficiency').textContent = efficiency.toFixed(2) + '%';
         }
 
@@ -2995,21 +2998,25 @@
             const operatorStats = {};
             lastMonth.forEach(s => {
                 if (!operatorStats[s.operator]) {
-                    operatorStats[s.operator] = { totalST: 0, internalST: 0, count: 0 };
+                    operatorStats[s.operator] = { totalST: 0, internalST: 0, count: 0, totalRating: 0 };
                 }
                 operatorStats[s.operator].totalST += (s.internalST || 0) + (s.externalTotal || 0) + (s.wasteTotal || 0);
                 operatorStats[s.operator].internalST += (s.internalST || 0);
+                operatorStats[s.operator].totalRating += (s.sessionRating || 100);
                 operatorStats[s.operator].count += 1;
             });
 
             const operatorPerformanceDiv = document.getElementById('operatorPerformanceCards');
             if (operatorPerformanceDiv) {
                 const topOperators = Object.entries(operatorStats)
-                    .map(([name, data]) => ({
-                        name,
-                        efficiency: data.totalST === 0 ? 0 : ((data.internalST / data.totalST) * 100).toFixed(1),
-                        sessions: data.count
-                    }))
+                    .map(([name, data]) => {
+                        const avgRating = data.count > 0 ? (data.totalRating / data.count) / 100 : 1;
+                        return {
+                            name,
+                            efficiency: data.totalST === 0 ? 0 : ((data.internalST / data.totalST) * 100 * avgRating).toFixed(1),
+                            sessions: data.count
+                        };
+                    })
                     .sort((a, b) => b.efficiency - a.efficiency)
                     .slice(0, 4);
 
@@ -3367,7 +3374,8 @@
             const csv = ['© 2026 Konrad Andrag. All rights reserved.', '', 'Date,Item Master No,Operator,Activities,Efficiency,Internal ST,External ST,Waste ST,Final Std Time'];
             sessions.forEach(s => {
                 const total = (s.internalST || 0) + (s.externalTotal || 0) + (s.wasteTotal || 0);
-                const efficiency = total === 0 ? 0 : ((s.internalST || 0) / total * 100).toFixed(1);
+                const rating = (s.sessionRating || 100) / 100;
+                const efficiency = total === 0 ? 0 : ((s.internalST || 0) / total * 100 * rating).toFixed(1);
                 csv.push(`"${s.date}","${s.itemMasterNo}","${s.operator}",${s.activities?.length || 0},${efficiency},"${(s.internalST || 0).toFixed(2)}","${(s.externalTotal || 0).toFixed(2)}","${(s.wasteTotal || 0).toFixed(2)}","${total.toFixed(2)}"`);
             });
 
@@ -3408,7 +3416,8 @@
             const csv = ['© 2026 Konrad Andrag. All rights reserved.', '', 'Date,Item Master No,Operator,Activities,Efficiency,Internal ST,External ST,Waste ST,Final Std Time'];
             starredSessions.forEach(s => {
                 const total = (s.internalST || 0) + (s.externalTotal || 0) + (s.wasteTotal || 0);
-                const efficiency = total === 0 ? 0 : ((s.internalST || 0) / total * 100).toFixed(1);
+                const rating = (s.sessionRating || 100) / 100;
+                const efficiency = total === 0 ? 0 : ((s.internalST || 0) / total * 100 * rating).toFixed(1);
                 csv.push(`"${s.date}","${s.itemMasterNo}","${s.operator}",${s.activities?.length || 0},${efficiency},"${(s.internalST || 0).toFixed(2)}","${(s.externalTotal || 0).toFixed(2)}","${(s.wasteTotal || 0).toFixed(2)}","${total.toFixed(2)}"`);
             });
 
@@ -3839,7 +3848,9 @@
 
                 const total = filtered.reduce((sum, s) => sum + (s.internalST || 0) + (s.externalTotal || 0) + (s.wasteTotal || 0), 0);
                 const internal = filtered.reduce((sum, s) => sum + (s.internalST || 0), 0);
-                const efficiency = total === 0 ? 0 : ((internal / total) * 100).toFixed(1);
+                const totalRating = filtered.reduce((sum, s) => sum + (s.sessionRating || 100), 0);
+                const avgRating = filtered.length > 0 ? totalRating / filtered.length : 100;
+                const efficiency = total === 0 ? 0 : ((internal / total) * 100 * (avgRating / 100)).toFixed(1);
 
                 return { item, count: filtered.length, efficiency, totalST: total.toFixed(2), internal: internal.toFixed(2) };
             });
