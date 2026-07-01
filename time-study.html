@@ -3176,7 +3176,8 @@
             if (tbody) {
                 tbody.innerHTML = filtered.sort((a, b) => b.date.localeCompare(a.date)).map((session, idx) => {
                     const totalST = (session.internalST || 0) + (session.externalTotal || 0) + (session.wasteTotal || 0);
-                    const eff = totalST === 0 ? 0 : ((session.internalST || 0) / totalST * 100).toFixed(1);
+                    const rating = (session.sessionRating || 100) / 100;
+                    const eff = totalST === 0 ? 0 : ((session.internalST || 0) / totalST * 100 * rating).toFixed(1);
                     const isStarred = starred.some(s => s.date === session.date && s.operator === session.operator && s.itemMasterNo === session.itemMasterNo);
                     const starIcon = isStarred ? '⭐' : '☆';
                     return `
@@ -3197,21 +3198,25 @@
             // Update chart with DAILY AVERAGES
             const chartCanvas = document.getElementById('efficiencyChart');
             if (chartCanvas && typeof Chart !== 'undefined') {
-                // Group filtered sessions by date and calculate daily averages
+                // Group filtered sessions by date and calculate daily averages (including performance rating)
                 const byDate = {};
                 filtered.forEach(s => {
                     if (!byDate[s.date]) {
-                        byDate[s.date] = { totalInternalST: 0, totalST: 0 };
+                        byDate[s.date] = { totalInternalST: 0, totalST: 0, totalRating: 0, count: 0 };
                     }
+                    const rating = (s.sessionRating || 100) / 100;
                     byDate[s.date].totalInternalST += (s.internalST || 0);
                     byDate[s.date].totalST += (s.internalST || 0) + (s.externalTotal || 0) + (s.wasteTotal || 0);
+                    byDate[s.date].totalRating += rating;
+                    byDate[s.date].count += 1;
                 });
 
                 const efficiencies = Object.entries(byDate)
-                    .map(([date, data]) => ({
-                        date: date,
-                        efficiency: data.totalST === 0 ? 0 : ((data.totalInternalST / data.totalST) * 100).toFixed(1)
-                    }))
+                    .map(([date, data]) => {
+                        const avgRating = data.count > 0 ? data.totalRating / data.count : 1;
+                        const efficiency = data.totalST === 0 ? 0 : ((data.totalInternalST / data.totalST) * 100 * avgRating).toFixed(1);
+                        return { date: date, efficiency: efficiency };
+                    })
                     .sort((a, b) => new Date(a.date) - new Date(b.date));
 
                 console.log('Filtered daily averages for chart:', efficiencies);
