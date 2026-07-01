@@ -3489,8 +3489,10 @@
             try {
                 const ratingEl = document.getElementById('detailRating');
                 const allowanceEl = document.getElementById('detailAllowance');
+                const stEl = document.getElementById('detailST');
                 const ratingText = ratingEl ? ratingEl.textContent.replace('%', '').trim() : '100';
                 const allowanceText = allowanceEl ? allowanceEl.textContent.replace('%', '').trim() : '0';
+                const stTotal = stEl ? stEl.textContent : '0.00';
 
                 let csv = '© 2026 Konrad Andrag. All rights reserved.\n';
                 csv += 'DIGITAL TIME STUDY REPORT\n\n';
@@ -3500,25 +3502,19 @@
                 csv += `Operator,${currentViewingSession.operator}\n`;
                 csv += `Performance Rating,${ratingText}%\n`;
                 csv += `Allowance,${allowanceText}%\n`;
+                csv += `Standard Time (Total),${stTotal}\n`;
 
-                // Calculate both totals from table (ensures consistency)
-                let stTotal = 0;
+                // Calculate cycle time (exclude setup activities) from actual activity data
                 let cycleTime = 0;
-                const tbody = document.querySelector('#detailActivitiesTable tbody');
-                if (tbody) {
-                    const rows = tbody.querySelectorAll('tr');
-                    rows.forEach((row) => {
-                        const st = parseFloat(row.cells[5].textContent) || 0;
-                        const setupCheckbox = row.cells[7] ? row.cells[7].querySelector('input[type="checkbox"]') : null;
-                        const isSetup = setupCheckbox ? setupCheckbox.checked : false;
-
-                        stTotal += st;
-                        if (!isSetup) {
+                if (currentViewingActivities) {
+                    currentViewingActivities.forEach(activity => {
+                        const nt = (activity.diff * parseInt(ratingText) / 100);
+                        const st = nt * (1 + parseInt(allowanceText) / 100);
+                        if (!activity.isSetup) {
                             cycleTime += st;
                         }
                     });
                 }
-                csv += `Standard Time (Total),${stTotal.toFixed(2)}\n`;
                 csv += `Cycle Time (without setup),${cycleTime.toFixed(2)}\n\n`;
 
                 csv += 'No,Description,OT,DIFF,NT,ST,Classification\n';
