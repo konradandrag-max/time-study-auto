@@ -3085,8 +3085,11 @@
                 }
                 const dateStr = date.toISOString().split('T')[0];
                 const daySessions = sessions.filter(s => s.date === dateStr);
-                const dayEff = calcEfficiency(daySessions);
-                last30Days.push({ date: dateStr.split('-')[2], dateStr, efficiency: dayEff, count: daySessions.length });
+                // Only include days with at least one time study
+                if (daySessions.length > 0) {
+                    const dayEff = calcEfficiency(daySessions);
+                    last30Days.push({ date: dateStr.split('-')[2], dateStr, efficiency: dayEff, count: daySessions.length });
+                }
             }
 
             // Add error handling to chart rendering
