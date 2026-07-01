@@ -2594,14 +2594,20 @@
 
             // Show/hide back button based on screen
             const backBtn = document.getElementById('floatingBackBtn');
+            if (backBtn) {
+                if (screenId === 'homeScreen') {
+                    backBtn.style.display = 'none';
+                } else {
+                    backBtn.style.display = 'block';
+                }
+            }
+
             if (screenId === 'homeScreen') {
-                backBtn.style.display = 'none';
                 stopKeepAlive();
                 await loadDashboard();
                 if (state.recognition) state.recognition.abort();
                 state.shouldProcessSpeechResults = false;
             } else {
-                backBtn.style.display = 'block';
                 if (screenId === 'screen2') {
                     startKeepAlive();
                     state.shouldProcessSpeechResults = true;
