@@ -1446,6 +1446,7 @@
                                 <th>Date</th>
                                 <th>Item Master No</th>
                                 <th>Operator</th>
+                                <th>Job Number</th>
                                 <th>Activities</th>
                                 <th>Efficiency</th>
                                 <th>Standard Time (ST)</th>
@@ -3184,6 +3185,7 @@
                             <td>${session.date}</td>
                             <td>${session.itemMasterNo}</td>
                             <td>${session.operator}</td>
+                            <td>${session.jobNumber || '-'}</td>
                             <td>${session.activities?.length || 0}</td>
                             <td>${eff}%</td>
                             <td style="font-weight: bold; color: #28a745;">${totalST.toFixed(2)}</td>
