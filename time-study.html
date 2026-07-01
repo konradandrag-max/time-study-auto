@@ -3483,11 +3483,9 @@
                 const ratingEl = document.getElementById('detailRating');
                 const allowanceEl = document.getElementById('detailAllowance');
                 const stEl = document.getElementById('detailST');
-                const cycleTimeEl = document.getElementById('cycleTimeST');
                 const ratingText = ratingEl ? ratingEl.textContent.replace('%', '').trim() : '100';
                 const allowanceText = allowanceEl ? allowanceEl.textContent.replace('%', '').trim() : '0';
                 const stTotal = stEl ? stEl.textContent : '0.00';
-                const cycleTime = cycleTimeEl ? cycleTimeEl.textContent : '0.00';
 
                 let csv = '© 2026 Konrad Andrag. All rights reserved.\n';
                 csv += 'DIGITAL TIME STUDY REPORT\n\n';
@@ -3498,10 +3496,24 @@
                 csv += `Performance Rating,${ratingText}%\n`;
                 csv += `Allowance,${allowanceText}%\n`;
                 csv += `Standard Time (Total),${stTotal}\n`;
-                csv += `Cycle Time (without setup),${cycleTime}\n\n`;
+
+                // Calculate cycle time (sum of ST for non-setup activities)
+                let cycleTime = 0;
+                const tbody = document.querySelector('#detailActivitiesTable tbody');
+                if (tbody) {
+                    const rows = tbody.querySelectorAll('tr');
+                    rows.forEach((row) => {
+                        const setupCheckbox = row.cells[7] ? row.cells[7].querySelector('input[type="checkbox"]') : null;
+                        const isSetup = setupCheckbox ? setupCheckbox.checked : false;
+                        if (!isSetup) {
+                            const st = parseFloat(row.cells[5].textContent) || 0;
+                            cycleTime += st;
+                        }
+                    });
+                }
+                csv += `Cycle Time (without setup),${cycleTime.toFixed(2)}\n\n`;
 
                 csv += 'No,Description,OT,DIFF,NT,ST,Classification\n';
-                const tbody = document.querySelector('#detailActivitiesTable tbody');
                 if (tbody) {
                     const rows = tbody.querySelectorAll('tr');
                     rows.forEach((row) => {
