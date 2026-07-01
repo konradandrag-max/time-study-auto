@@ -1335,6 +1335,7 @@
                             <th>NT</th>
                             <th>ST</th>
                             <th>Type</th>
+                            <th>Setup</th>
                         </tr>
                     </thead>
                     <tbody></tbody>
@@ -2272,6 +2273,11 @@
             updateSummary();
         }
 
+        // Toggle setup status for activity in detail view
+        function toggleDetailActivitySetup(index, isSetup) {
+            // This will be used when saving edited session
+        }
+
         // Update session fields
         function updateSessionDate(value) {
             state.session.date = value;
@@ -2609,7 +2615,7 @@
             const session = sessions.find(s => s.date === date && s.itemMasterNo === itemMasterNo && s.operator === operator);
             if (!session) return;
 
-            currentViewingSession = { date, itemMasterNo, operator };
+            currentViewingSession = { date, itemMasterNo, operator, jobNumber: session.jobNumber };
 
             // Populate header
             document.getElementById('detailPart').textContent = session.itemMasterNo;
@@ -2623,7 +2629,7 @@
 
             // Populate activities table
             const tbody = document.querySelector('#detailActivitiesTable tbody');
-            tbody.innerHTML = (session.activities || []).map(activity => {
+            tbody.innerHTML = (session.activities || []).map((activity, index) => {
                 const nt = (activity.diff * session.sessionRating / 100).toFixed(2);
                 const st = (nt * (1 + session.sessionAllowance / 100)).toFixed(2);
                 const typeColor = activity.classification === 'Internal' ? '#28a745' : activity.classification === 'External' ? '#ff9800' : '#dc3545';
@@ -2636,6 +2642,7 @@
                         <td>${nt}</td>
                         <td>${st}</td>
                         <td><span style="background: ${typeColor}; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px;">${activity.classification || 'Unclassified'}</span></td>
+                        <td><input type="checkbox" ${activity.isSetup ? 'checked' : ''} onchange="toggleDetailActivitySetup(${index}, this.checked)" style="cursor: pointer;"></td>
                     </tr>
                 `;
             }).join('');
@@ -2786,8 +2793,10 @@
                 if (rows[idx]) {
                     const descInput = document.getElementById(`activity_desc_${idx}`);
                     const typeSelect = document.getElementById(`activity_type_${idx}`);
+                    const setupCheckbox = rows[idx].querySelector('input[type="checkbox"]');
                     if (descInput) activity.description = descInput.value;
                     if (typeSelect) activity.classification = typeSelect.value;
+                    if (setupCheckbox) activity.isSetup = setupCheckbox.checked;
                 }
             });
 
