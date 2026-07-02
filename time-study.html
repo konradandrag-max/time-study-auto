@@ -3389,7 +3389,7 @@
                 csv.push(`${s.date},${s.itemMasterNo},${s.operator},${s.jobNumber || ''},${s.activities?.length || 0},${efficiency},${(s.internalST || 0).toFixed(2)},${(s.externalTotal || 0).toFixed(2)},${(s.wasteTotal || 0).toFixed(2)},${total.toFixed(2)}`);
             });
 
-            const blob = new Blob([csv.join('\n')], { type: 'text/csv' });
+            const blob = new Blob([csv.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
             link.setAttribute('href', URL.createObjectURL(blob));
             link.setAttribute('download', `time_study_all_${new Date().toISOString().split('T')[0]}.csv`);
@@ -3432,7 +3432,7 @@
                 csv.push(`${s.date},${s.itemMasterNo},${s.operator},${s.jobNumber || ''},${s.activities?.length || 0},${efficiency},${(s.internalST || 0).toFixed(2)},${(s.externalTotal || 0).toFixed(2)},${(s.wasteTotal || 0).toFixed(2)},${total.toFixed(2)}`);
             });
 
-            const blob = new Blob([csv.join('\n')], { type: 'text/csv' });
+            const blob = new Blob([csv.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
             link.setAttribute('href', URL.createObjectURL(blob));
             link.setAttribute('download', `time_study_starred_${new Date().toISOString().split('T')[0]}.csv`);
