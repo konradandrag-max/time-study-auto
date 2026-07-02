@@ -3860,8 +3860,8 @@
 
             const comparisons = items.map(item => {
                 const filtered = sessions.filter(s => {
-                    if (compareBy === 'operator') return s.operator === item;
-                    if (compareBy === 'job') return s.jobNo === item;
+                    if (compareBy === 'operator') return s.operator.toLowerCase() === item.toLowerCase();
+                    if (compareBy === 'job') return (s.jobNumber || '').toLowerCase() === item.toLowerCase();
                     if (compareBy === 'date') return s.date === item;
                     return false;
                 });
