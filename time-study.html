@@ -3017,9 +3017,11 @@
                 const topOperators = Object.entries(operatorStats)
                     .map(([name, data]) => {
                         const avgRating = data.count > 0 ? (data.totalRating / data.count) / 100 : 1;
+                        const efficiencyNum = data.totalST === 0 ? 0 : (data.internalST / data.totalST) * 100 * avgRating;
                         return {
                             name,
-                            efficiency: data.totalST === 0 ? 0 : ((data.internalST / data.totalST) * 100 * avgRating).toFixed(1),
+                            efficiency: parseFloat(efficiencyNum.toFixed(1)),
+                            efficiencyDisplay: efficiencyNum.toFixed(1),
                             sessions: data.count,
                             internalST: data.internalST,
                             totalST: data.totalST
@@ -3028,14 +3030,12 @@
                     .sort((a, b) => b.efficiency - a.efficiency)
                     .slice(0, 4);
 
-                console.log('Operator Performance:', { operatorStats, topOperators, lastMonthCount: lastMonth.length });
-
                 if (topOperators.length > 0) {
                     operatorPerformanceDiv.innerHTML = topOperators.map(op => `
                         <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
                             <div style="font-size: 14px; opacity: 0.9; margin-bottom: 8px;">Operator</div>
                             <div style="font-size: 24px; font-weight: bold; margin-bottom: 8px;">${op.name}</div>
-                            <div style="font-size: 12px; opacity: 0.8;">Efficiency: <strong style="font-size: 16px;">${op.efficiency}%</strong></div>
+                            <div style="font-size: 12px; opacity: 0.8;">Efficiency: <strong style="font-size: 16px;">${op.efficiencyDisplay}%</strong></div>
                             <div style="font-size: 12px; opacity: 0.8;">Sessions: <strong>${op.sessions}</strong></div>
                             <div style="font-size: 12px; opacity: 0.8;">Internal ST: <strong>${op.internalST.toFixed(2)}</strong></div>
                             <div style="font-size: 12px; opacity: 0.8;">Total ST: <strong>${op.totalST.toFixed(2)}</strong></div>
